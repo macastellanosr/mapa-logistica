@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logística Auditorio - Panel Pro</title>
+    <title>Logística Auditorio - Panel Pro (Actualizado)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -19,119 +19,77 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Fija y Profesional */
+        /* Sidebar */
         .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid #222; display: flex; flex-direction: column; z-index: 100; }
         .sidebar-header { padding: 30px 20px; border-bottom: 1px solid #222; text-align: center; }
-        .sidebar-header h2 { font-size: 1rem; color: var(--primary); margin: 0; letter-spacing: 2px; text-transform: uppercase; }
+        .sidebar-header h2 { font-size: 0.9rem; color: var(--primary); margin: 0; letter-spacing: 2px; text-transform: uppercase; }
         
         .menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-        .menu-item { padding: 14px 25px; cursor: pointer; color: #888; display: flex; align-items: center; gap: 12px; transition: all 0.3s; border-left: 4px solid transparent; }
-        .menu-item i { width: 20px; font-size: 1.1rem; }
+        .menu-item { padding: 14px 25px; cursor: pointer; color: #888; display: flex; align-items: center; gap: 12px; transition: all 0.3s; border-left: 4px solid transparent; font-size: 0.9rem; }
+        .menu-item i { width: 20px; }
         .menu-item:hover { background: #111; color: white; }
         .menu-item.active { background: #1a1a1a; color: white; border-left-color: var(--primary); font-weight: bold; }
 
-        /* Contenido Principal */
+        /* Main Content */
         .main { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
-        
-        /* Barra Superior */
         .top-bar { padding: 0 30px; height: 70px; background: var(--card); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .legend { display: flex; gap: 20px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #bbb; }
-        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
-
-        /* Visor de Mapa */
+        
+        /* Pins */
         .map-viewport { flex: 1; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); }
-        .map-container { position: relative; display: inline-block; box-shadow: 0 0 50px rgba(0,0,0,0.8); border: 1px solid #333; transition: transform 0.3s ease; }
-        .map-img { display: block; max-width: 85vw; max-height: 75vh; height: auto; width: auto; }
+        .map-container { position: relative; display: inline-block; box-shadow: 0 0 50px rgba(0,0,0,0.8); border: 1px solid #333; }
+        .map-img { display: block; max-width: 85vw; max-height: 75vh; height: auto; width: auto; opacity: 1; transition: opacity 0.3s; }
 
-        /* PINES MÁS GRANDES Y MEJORADOS */
         .pin {
-            position: absolute; 
-            width: 32px; /* Aumentado de 22px */
-            height: 32px; /* Aumentado de 22px */
-            border-radius: 50%;
+            position: absolute; width: 34px; height: 34px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; 
-            font-size: 12px; font-weight: 800;
-            color: white; border: 2px solid #fff; 
-            transform: translate(-50%, -50%);
-            cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            z-index: 10;
+            font-size: 13px; font-weight: 800; color: white; border: 2px solid #fff; 
+            transform: translate(-50%, -50%); cursor: pointer; z-index: 10;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-
-        /* Efecto de Pulso para visibilidad */
         .pin::after {
-            content: '';
-            position: absolute;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            z-index: -1;
+            content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            animation: pulse 2s infinite; z-index: -1;
         }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2); opacity: 0; } }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.8); opacity: 0; }
-        }
-
-        .pin:hover { 
-            transform: translate(-50%, -50%) scale(1.3); 
-            z-index: 100; 
-            box-shadow: 0 0 20px #fff;
-        }
-
-        .pin-sup { background: var(--sup); border-radius: 6px; }
+        .pin:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 100; box-shadow: 0 0 20px #fff; }
+        .pin-sup { background: var(--sup); border-radius: 8px; }
         .pin-sup::after { background: var(--sup-glow); }
-        
         .pin-vol { background: var(--primary); }
         .pin-vol::after { background: var(--primary-glow); }
 
-        /* PopUp */
+        /* Modal Refinado */
         #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; }
         #modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff; color: #111; width: 90%; max-width: 400px; border-radius: 16px; z-index: 1001; 
+            background: #fff; color: #111; width: 90%; max-width: 450px; border-radius: 16px; z-index: 1001; 
             overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            animation: modalIn 0.3s ease-out;
         }
-
-        @keyframes modalIn {
-            from { opacity: 0; transform: translate(-50%, -40%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-
         .modal-header { padding: 20px; background: #f8f8f8; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 30px; }
-        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 18px; cursor: pointer; font-weight: bold; font-size: 1rem; letter-spacing: 1px; transition: background 0.2s; }
-        .close-btn:hover { background: var(--primary); }
-
+        .modal-body { padding: 25px; max-height: 60vh; overflow-y: auto; }
+        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 18px; cursor: pointer; font-weight: bold; font-size: 1rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>Auditorio Monitor</h2>
-        </div>
+        <div class="sidebar-header"><h2>Auditorio Monitor</h2></div>
         <div class="menu">
-            <div class="menu-item active" onclick="loadView('general')"><i class="fas fa-th-large"></i> Mapa General</div>
-            <div class="menu-item" onclick="loadView('z1')"><i class="fas fa-door-open"></i> Zona 1</div>
-            <div class="menu-item" onclick="loadView('z2')"><i class="fas fa-chair"></i> Zona 2</div>
-            <div class="menu-item" onclick="loadView('z3')"><i class="fas fa-users"></i> Zona 3</div>
-            <div class="menu-item" onclick="loadView('z4')"><i class="fas fa-exchange-alt"></i> Zona 4</div>
-            <div class="menu-item" onclick="loadView('z5')"><i class="fas fa-chevron-right"></i> Zona 5</div>
-            <div class="menu-item" onclick="loadView('z6')"><i class="fas fa-road"></i> Zona 6</div>
+            <div class="menu-item active" onclick="loadView('all')"><i class="fas fa-th-large"></i> MAPA GENERAL</div>
+            <div class="menu-item" onclick="loadView('z1')"><i class="fas fa-door-open"></i> ZONA 1 (SPK)</div>
+            <div class="menu-item" onclick="loadView('z2')"><i class="fas fa-chair"></i> ZONA 2 (PRO/ALAB)</div>
+            <div class="menu-item" onclick="loadView('z3')"><i class="fas fa-users"></i> ZONA 3 (CENTRO)</div>
+            <div class="menu-item" onclick="loadView('z4')"><i class="fas fa-exchange-alt"></i> ZONA 4 (DERECHA)</div>
+            <div class="menu-item" onclick="loadView('z5')"><i class="fas fa-chevron-right"></i> ZONA 5 (PRIORIDAD)</div>
+            <div class="menu-item" onclick="loadView('z6')"><i class="fas fa-road"></i> ZONA 6 (BETEL)</div>
         </div>
     </aside>
 
     <main class="main">
         <header class="top-bar">
             <h1 id="view-title" style="margin:0; font-weight: 300; font-size: 1.1rem; letter-spacing: 1px;">MAPA GENERAL</h1>
-            <div class="legend">
-                <div class="legend-item"><div class="dot" style="background:var(--sup)"></div> Supervisor</div>
-                <div class="legend-item"><div class="dot" style="background:var(--primary)"></div> Voluntario</div>
-            </div>
+            <div style="font-size: 0.8rem; color: #888;"><i class="fas fa-broadcast-tower"></i> RADIO ACTIVA</div>
         </header>
 
         <div class="map-viewport">
@@ -145,93 +103,84 @@
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
         <div class="modal-header">
-            <span id="m-id" style="font-weight: bold; color: var(--primary); font-size: 0.8rem; text-transform: uppercase;"></span>
-            <i class="fas fa-user-circle" style="color:#ddd; font-size: 1.5rem;"></i>
+            <span id="m-pos" style="font-weight: bold; color: var(--primary); font-size: 0.75rem;"></span>
+            <span id="m-radio" style="font-size: 0.7rem; background: #eee; padding: 4px 8px; border-radius: 4px;"></span>
         </div>
         <div class="modal-body">
-            <h2 id="m-name" style="margin: 0 0 12px 0; font-size: 1.5rem; letter-spacing: -0.5px; color: #000;"></h2>
-            <div style="width: 30px; height: 3px; background: var(--primary); margin-bottom: 15px;"></div>
-            <p id="m-task" style="color: #444; font-size: 1rem; line-height: 1.6; margin: 0;"></p>
+            <h2 id="m-name" style="margin: 0 0 5px 0; font-size: 1.4rem;"></h2>
+            <h4 id="m-zone" style="margin: 0 0 15px 0; color: #666; font-weight: 500; font-size: 0.9rem;"></h4>
+            <div style="width: 40px; height: 3px; background: var(--primary); margin-bottom: 15px;"></div>
+            <p id="m-task" style="color: #333; font-size: 0.95rem; line-height: 1.6; margin: 0;"></p>
         </div>
-        <button class="close-btn" onclick="closeModal()">ENTENDIDO</button>
+        <button class="close-btn" onclick="closeModal()">Cerrar</button>
     </div>
 
     <script>
         const appData = {
-            views: {
-                general: { img: 'mapas.png', title: 'MAPA GENERAL', filter: 'all' },
-                z1: { img: 'zona1.png', title: 'VISTA: ZONA 1', filter: [1, 2] },
-                z2: { img: 'zona2.png', title: 'VISTA: ZONA 2', filter: [3, 4, 5, 6] },
-                z3: { img: 'zona3.png', title: 'VISTA: ZONA 3', filter: [7, 8, 9, 10, 11] },
-                z4: { img: 'zona4.png', title: 'VISTA: ZONA 4', filter: [12, 13, 14, 15] },
-                z5: { img: 'zona5.png', title: 'VISTA: ZONA 5', filter: [16, 17, 18, 19, 20] },
-                z6: { img: 'zona6.png', title: 'VISTA: ZONA 6', filter: [21, 22, 23, 24, 25, 26, 27, 28] }
-            },
             positions: [
-                {id: 1, t: 22.1, l: 72.3, type: 'sup', name: 'Laura Daniela Arias', task: 'Supervisor Derecho. Responsable de coordinación de radio y check-in zonas 1-4.'},
-                {id: 16, t: 21.0, l: 51.3, type: 'sup', name: 'Juan Carlos Castrillón', task: 'Supervisor Izquierdo. Control de flujo en rampas y caracol lobby.'},
-                {id: 2, t: 6.0, l: 77.8, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Orientación inicial y papás SPK.'},
-                {id: 3, t: 25.0, l: 73.5, type: 'vol', name: 'Marleny Masmela', task: 'Zona 2: Sillas de alabanza y control de lazo.'},
-                {id: 4, t: 38.0, l: 76.0, type: 'vol', name: 'Edith Pertuz', task: 'Zona 2: Apoyo en pasillo derecho.'},
-                {id: 7, t: 26.0, l: 69.0, type: 'vol', name: 'Maritriny Barrera', task: 'Zona 3: Reservas Comité y Staff.'},
-                {id: 9, t: 48.0, l: 74.0, type: 'vol', name: 'Marcela Páez', task: 'Zona 3: Semáforo de escaleras y flujo baños.'},
-                {id: 17, t: 26.0, l: 47.5, type: 'vol', name: 'Sonia Patricia López', task: 'Zona 5: Prioritarios y rampa zona 6.'},
-                {id: 19, t: 48.0, l: 39.5, type: 'vol', name: 'July Jiménez', task: 'Zona 5: Ingreso rampa y forros negros.'},
-                {id: 26, t: 30.0, l: 17.5, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Rampa Betel y entrega de caritas felices.'}
+                {id: 1, type: 'sup', zone: 'Supervisor Zonas 1,2,3,4', name: 'Laura Daniela Arias Fontecha', radio: 'RADIO', t: 22, l: 72, task: 'Organiza voluntarios zona derecha. Responsable de check-in, uniforme, conocimiento de lazos y número de sillas. Supervisa oración espiritual y reporta al Coordinador.'},
+                {id: 2, type: 'vol', zone: 'ZONA 1', name: 'Rafael Moncaleano / Gloria Parra', radio: 'RADIO', t: 8, l: 78, task: 'Responsable de zona. Ubicación de abajo hacia arriba. Fines de semana: Papás SPK. Sostiene cuerda abajo zona 1. Coloca forros negros (fila 1 y mitad).'},
+                {id: 3, type: 'vol', zone: 'ZONA 2 Abajo', name: 'Marleny Masmela', radio: '-', t: 25, l: 74, task: 'Fila 5 es fila de paso. Reserva alabanza/líderes. Coloca capas de lluvia en rampa Zona 1. Salida: sostiene lazo arriba, primero sale población prioritaria.'},
+                {id: 4, type: 'vol', zone: 'ZONA 2 Abajo', name: 'Edith Mayerly Pertuz Aviles', radio: '-', t: 38, l: 76, task: 'Apoya acomodación y caritas felices. Salida: saca últimas 4 filas por la última fila de zona 2, demás por escalera interna.'},
+                {id: 5, type: 'vol', zone: 'ZONA 2 Arriba', name: 'Carlos Julio González Martínez', radio: 'RADIO', t: 15, l: 85, task: 'Responsable zona arriba. Papás SPK fines de semana. Reserva Traducción. Coloca 3 forros negros estratégicos. Salida: sostiene lazo abajo.'},
+                {id: 6, type: 'vol', zone: 'ZONA 2 Arriba', name: 'Adriana Isabel Alfonso Palacino', radio: '-', t: 10, l: 90, task: 'Apoya ingreso a sillas. En salida sostiene lazo y dirige salida de nuevos con caritas felices.'},
+                {id: 7, type: 'vol', zone: 'ZONA 3 Lado Derecho', name: 'Maritriny Barrera de Lopez', radio: 'RADIO', t: 26, l: 68, task: 'Responsable de zona. Acomodación abajo hacia arriba. Reserva Comité/Staff. Salida: alterna filas derecha/izquierda por escalera interna.'},
+                {id: 8, type: 'vol', zone: 'ZONA 3 Lado Derecho', name: 'Laurent Daniela Díaz Escudero', radio: '-', t: 34, l: 70, task: 'Sostiene bandera para nuevos y los dirige a Orientación Centro. Salida: sostiene lazo en la parte baja.'},
+                {id: 9, type: 'vol', zone: 'ZONA 3 Semáforo', name: 'Marcela Eugenia Paez Cervantes', radio: '-', t: 50, l: 74, task: 'Control de flujo a baños para evitar doble vía en escaleras. Salida: realiza la "L" con el lazo para ampliar flujo.'},
+                {id: 10, type: 'vol', zone: 'ZONA 3 Lado Izquierdo', name: 'Myriam Rojas Sandoval', radio: 'RADIO', t: 36, l: 52, task: 'Responsable zona. Reserva líderes. Sostiene bandera para nuevos. Salida alterna derecha/izquierda. Pendiente de salida Zona 5.'},
+                {id: 11, type: 'vol', zone: 'ZONA 3 Semáforo Izq', name: 'María Rocio Rojas Amado', radio: '-', t: 52, l: 50, task: 'Semáforo baños escalera izquierda. Evita doble vía. En salida realiza la "L" con el lazo.'},
+                {id: 12, type: 'vol', zone: 'ZONA 4 Lado Derecho', name: 'Jose Guillermo Carrillo', radio: 'RADIO', t: 58, l: 70, task: 'Responsable zona. Capas lluvia alternas debajo de sillas. Salida: sostiene cuerda abajo coordinando con centro derecho.'},
+                {id: 13, type: 'vol', zone: 'ZONA 4 Lado Derecho', name: 'Marisol Cubillos Pedraza', radio: '-', t: 65, l: 72, task: 'Apoya logística, guía nuevos con caritas felices. Salida: sostiene lazo en la parte de arriba.'},
+                {id: 14, type: 'vol', zone: 'ZONA 4 Lado Izquierdo', name: 'Adriana Patricia Corral Galvis', radio: 'RADIO', t: 58, l: 48, task: 'Responsable zona. Ubicación abajo-arriba. 2 forros negros. Salida: sostiene lazo abajo, alterna filas.'},
+                {id: 15, type: 'vol', zone: 'ZONA 4 Lado Izquierdo', name: 'Mónica Alexandra Sánchez', radio: '-', t: 65, l: 45, task: 'Apoya acomodación y caritas felices. Salida: se ubica arriba para dirigir flujo.'},
+                {id: 16, type: 'sup', zone: 'Supervisor Zonas 5,6', name: 'Juan Carlos Castrillon', radio: 'RADIO', t: 21, l: 51, task: 'Supervisa rampas, centros y caracol lobby. Controla contadores e ingresos prioritarios. Responsable puestos 16 al 30.'},
+                {id: 17, type: 'vol', zone: 'ZONA 5 Abajo', name: 'Sonia Patricia López Mora', radio: 'RADIO', t: 28, l: 45, task: 'Responsable zona prioritarios y sillas de ruedas. Capas lluvia en rampa izq. Salida: arriba sosteniendo lazo, sale primero prioridad.'},
+                {id: 18, type: 'vol', zone: 'ZONA 5 Abajo', name: 'Jaqueline Arias Neiva', radio: '-', t: 35, l: 43, task: 'Apoya reserva líderes (50 sillas) y prioritarios. Salida: sostiene lazo abajo y dirige nuevos a rampa.'},
+                {id: 19, type: 'vol', zone: 'ZONA 5 Centro', name: 'July Jiménez', radio: 'RADIO', t: 48, l: 40, task: 'Responsable ingreso por rampa. 3 forros negros. Salida: coordina con centro izquierdo envío de filas.'},
+                {id: 20, type: 'vol', zone: 'ZONA 5 Apoyo', name: 'Sin Asignar', radio: '-', t: 55, l: 38, task: 'Apoya ingreso y ubicación según necesidad. En salida sostiene lazo.'},
+                {id: 21, type: 'vol', zone: 'ZONA 5 Arriba', name: 'Gloria Milena González', radio: 'RADIO', t: 15, l: 35, task: 'Dirige hacia arriba. Capas lluvia debajo de sillas (2-3 paquetes). Salida: lazo abajo. Nuevos salen por rampa Betel.'},
+                {id: 22, type: 'vol', zone: 'ZONA 5 Arriba', name: 'Ana Maria Palma López', radio: '-', t: 8, l: 32, task: 'Dirige ubicación arriba. Anima asistentes para salida. Pendiente de nuevos hacia Betel.'},
+                {id: 23, type: 'vol', zone: 'ZONA 5 Arriba', name: 'Luz Marina Londoño', radio: '-', t: 5, l: 28, task: 'Ubicado al final de la zona. Dirige acomodación y toma lazo para salida de iglesia y nuevos.'},
+                {id: 24, type: 'vol', zone: 'ZONA 6 Abajo', name: 'Martha Lucía Ceballos', radio: '-', t: 12, l: 40, task: 'Responsable zona. Capas en cada silla fila 1. Salida: sostiene cuerda abajo tras salida zona 8. Dirige por escalera interna.'},
+                {id: 25, type: 'vol', zone: 'ZONA 6 Abajo', name: 'Andrea Cifuentes', radio: 'RADIO', t: 18, l: 30, task: 'Apoya logística. Salida: arriba sostiene lazo, dirige últimas 4 filas hacia rampa Betel.'},
+                {id: 26, type: 'vol', zone: 'ZONA 6 Arriba', name: 'Arnulfo Enrique Canchila', radio: 'RADIO', t: 30, l: 18, task: 'Responsable zona extensa. Dirige desde abajo hacia arriba. Salida: sostiene lazo abajo. Nuevos por rampa Betel.'},
+                {id: 27, type: 'vol', zone: 'ZONA 6 Arriba', name: 'Sin Asignar', radio: '-', t: 22, l: 12, task: 'Apoya ubicación arriba en conjunto con equipo. Anima salida y vigila rampa Betel.'},
+                {id: 28, type: 'vol', zone: 'ZONA 6 Arriba', name: 'Ricardo Cuitiva Baracaldo', radio: '-', t: 10, l: 10, task: 'Dirige asistentes por fila de paso hacia rincón derecho. Toma lazo para salida por rampa Betel.'}
             ]
         };
 
-        // Rellenar puestos genéricos faltantes
-        for(let i=1; i<=28; i++) {
-            if(!appData.positions.find(p => p.id === i)) {
-                appData.positions.push({
-                    id: i, 
-                    t: 15 + (Math.random() * 70), 
-                    l: 15 + (Math.random() * 70), 
-                    type: 'vol', 
-                    name: `Puesto de Apoyo ${i}`, 
-                    task: 'Asignación logística general. Control de accesos y apoyo a supervisores de zona.'
-                });
-            }
-        }
-
-        function loadView(key) {
-            const v = appData.views[key] || appData.views.general;
-            const img = document.getElementById('main-map');
+        function loadView(zoneKey) {
             const layer = document.getElementById('pins-layer');
             const title = document.getElementById('view-title');
+            layer.innerHTML = '';
             
-            img.style.opacity = '0.3';
-            img.src = v.img;
-            title.innerText = v.title;
-            
-            img.onload = () => {
-                img.style.opacity = '1';
-                layer.innerHTML = '';
-                appData.positions.forEach(p => {
-                    if(v.filter === 'all' || v.filter.includes(p.id)) {
-                        const div = document.createElement('div');
-                        div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
-                        div.style.top = p.t + '%';
-                        div.style.left = p.l + '%';
-                        div.innerHTML = `<span>${p.id}</span>`;
-                        div.onclick = (e) => {
-                            e.stopPropagation();
-                            showInfo(p);
-                        };
-                        layer.appendChild(div);
-                    }
-                });
-            };
+            title.innerText = zoneKey === 'all' ? 'MAPA GENERAL' : `VISTA: ${zoneKey.toUpperCase()}`;
 
-            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            const activeItem = Array.from(document.querySelectorAll('.menu-item')).find(m => m.innerText.toLowerCase().includes(key.toLowerCase()) || (key === 'general' && m.innerText.includes('General')));
-            if(activeItem) activeItem.classList.add('active');
+            appData.positions.forEach(p => {
+                const isZoneMatch = zoneKey === 'all' || p.zone.toLowerCase().includes(zoneKey.toLowerCase());
+                
+                if (isZoneMatch) {
+                    const div = document.createElement('div');
+                    div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
+                    div.style.top = p.t + '%';
+                    div.style.left = p.l + '%';
+                    div.innerHTML = `<span>${p.id}</span>`;
+                    div.onclick = () => showInfo(p);
+                    layer.appendChild(div);
+                }
+            });
+
+            document.querySelectorAll('.menu-item').forEach(m => {
+                m.classList.remove('active');
+                if(m.innerText.toLowerCase().includes(zoneKey.toLowerCase())) m.classList.add('active');
+            });
         }
 
         function showInfo(p) {
-            document.getElementById('m-id').innerText = `ID Posición: #${p.id}`;
+            document.getElementById('m-pos').innerText = `POSICIÓN #${p.id} - ${p.type.toUpperCase()}`;
+            document.getElementById('m-radio').innerText = p.radio === 'RADIO' ? '📻 CANAL RADIO' : 'NO RADIO';
             document.getElementById('m-name').innerText = p.name;
+            document.getElementById('m-zone').innerText = p.zone;
             document.getElementById('m-task').innerText = p.task;
             document.getElementById('modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
@@ -242,7 +191,7 @@
             document.getElementById('overlay').style.display = 'none';
         }
 
-        window.onload = () => loadView('general');
+        window.onload = () => loadView('all');
     </script>
 </body>
 </html>
