@@ -75,14 +75,35 @@
     </div>
 
     <script>
-        const data = {
-            2: { title: "ID 2: Escalera Superior", desc: "<b>Responsable:</b> Por asignar <br><b>Tarea:</b> Controlar flujo de entrada." },
-            4: { title: "ID 4: Pasillo Zona 1", desc: "<b>Responsable:</b> Voluntario A <br><b>Tarea:</b> Acomodación rápida." },
-            13: { title: "ID 13: Acceso Tarima", desc: "<b>Responsable:</b> Staff Seguridad <br><b>Tarea:</b> Verificar escarapelas VIP." },
-            26: { title: "ID 26: Salida Eléctrica", desc: "<b>Responsable:</b> Logística General <br><b>Tarea:</b> Mantener escaleras despejadas." },
-            30: { title: "ID 30: Salida Emergencia", desc: "<b>Responsable:</b> Seguridad <br><b>Tarea:</b> Punto de evacuación sur." }
-            // Agrega aquí los demás IDs siguiendo el mismo formato
-        };
+      const data = {
+    1: { title: "Puesto 1", desc: "Líder Zona Derecha superior. Responsable de flujo en Zona 1." },
+    2: { title: "Puesto 2", desc: "Control de Escaleras Zona Derecha. Mantener pasillo despejado." },
+    3: { title: "Puesto 3", desc: "Apoyo Zona 3 (Esquina). Verificación de silletería." },
+    4: { title: "Puesto 4", desc: "Pasillo Central Derecho. Guía de asistentes a Zona 2." },
+    5: { title: "Puesto 5", desc: "Frente a Tarima (Derecha). Protocolo y primera fila." },
+    6: { title: "Puesto 6", desc: "Salida Derecha. Control de flujo hacia pasillo exterior." },
+    7: { title: "Puesto 7", desc: "Esquina Inferior Derecha. Vigilancia de perímetro." },
+    8: { title: "Puesto 8", desc: "Zona 7 (Líder). Coordinación de acomodadores centrales." },
+    9: { title: "Puesto 9", desc: "Pasillo interno Zona 7/9. Evitar aglomeraciones." },
+    10: { title: "Puesto 10", desc: "Apoyo Zona 9. Información a asistentes." },
+    11: { title: "Puesto 11", desc: "Pasillo Salida Derecha abajo. Control de puertas." },
+    12: { title: "Puesto 12", desc: "Esquina inferior central. Punto de información." },
+    13: { title: "Puesto 13", desc: "Líder Tarima Izquierda. Control de acceso a backstage." },
+    14: { title: "Puesto 14", desc: "Seguridad Tarima Lateral. Filtro de personal autorizado." },
+    15: { title: "Puesto 15", desc: "Pasillo Técnico. Control de cables y equipos." },
+    16: { title: "Puesto 16", desc: "Acceso Rampa Izquierda. Ayuda a personas con movilidad reducida." },
+    17: { title: "Puesto 17", desc: "Control Escalera Rampa. Flujo de entrada Izquierda." },
+    18: { title: "Puesto 18", desc: "Base Rampa Izquierda. Recepción de asistentes." },
+    19: { title: "Puesto 19", desc: "Líder Zona Izquierda superior. Coordinación Zona 10." },
+    23: { title: "Puesto 23", desc: "Filtro Zona Izquierda alta. Verificación de boletas." },
+    24: { title: "Puesto 24", desc: "Pasillo Zona 6/10. Guía de público." },
+    25: { title: "Puesto 25", desc: "Control Salida Coffee. Evitar comida dentro del auditorio." },
+    26: { title: "Puesto 26", desc: "Salida Eléctrica Arriba. Vigilancia mecánica." },
+    27: { title: "Puesto 27", desc: "Esquina Superior Izquierda. Seguridad perimetral." },
+    28: { title: "Puesto 28", desc: "Entrada Coffee Abajo. Control de acceso." },
+    29: { title: "Puesto 29", desc: "Escaleras de Emergencia. Mantener libre de obstáculos." },
+    30: { title: "Puesto 30", desc: "Salida de Emergencia Principal. Solo apertura en crisis." }
+};
 
         function showInfo(id) {
             const info = data[id] || { title: `ID ${id}`, desc: "Información pendiente por cargar en la base de datos." };
