@@ -3,45 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Logística - IDs Interactivos</title>
+    <title>Logística Auditorio - Mapa Interactivo</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f4f4; display: flex; flex-direction: column; align-items: center; }
-        .map-container { position: relative; width: 100%; max-width: 1100px; background: white; border: 1px solid #ccc; }
+        /* Regresamos al estilo oscuro y elegante */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Título estilizado que te gustó */
+        h1 { margin: 25px 0; font-weight: 300; letter-spacing: 1px; color: #eee; }
+        
+        .map-container { position: relative; width: 95%; max-width: 1100px; border: 2px solid #444; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .map-image { width: 100%; display: block; }
 
-        /* Estilo para los pines con ID visible */
+        /* Pines con ID: Mezcla de funcionalidad y estética */
         .pin {
             position: absolute;
-            width: 28px;
-            height: 28px;
+            width: 26px;
+            height: 26px;
             background: #ff5500;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
             z-index: 10;
         }
-        .pin:hover { transform: scale(1.2); background: #d44700; }
+        .pin:hover { transform: scale(1.3); background: #e64d00; box-shadow: 0 0 15px #ff5500; }
 
-        /* Pop-up / Modal */
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                 background: white; color: #333; border-radius: 12px; z-index: 1000; 
-                 width: 85%; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-header { padding: 15px; border-bottom: 2px solid #ff5500; font-weight: bold; }
-        .modal-body { padding: 20px; font-size: 14px; line-height: 1.5; }
+        /* Pop-up (Modal) Premium */
+        #modal { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: #fff; color: #333; padding: 0; border-radius: 15px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 1000; width: 90%; max-width: 420px; 
+            max-height: 80vh; overflow-y: auto; border-top: 10px solid #ff5500; 
+        }
+        
+        .modal-header { background: #f8f8f8; padding: 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; }
+        .modal-header h3 { margin: 0; color: #ff5500; font-size: 1.2em; }
+        .modal-header p { margin: 5px 0 0 0; font-weight: bold; color: #555; font-size: 0.9em; }
+        
+        .modal-body { padding: 20px; line-height: 1.6; font-size: 0.95em; color: #444; }
+        .radio-badge { background: #ff5500; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7em; vertical-align: middle; margin-left: 10px; }
+        
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                   background: rgba(0,0,0,0.7); z-index: 999; }
-        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 12px; border-radius: 0 0 12px 12px; cursor: pointer; }
+                   background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(4px); }
+        
+        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; 
+                     cursor: pointer; font-weight: bold; font-size: 1em; transition: background 0.2s; }
+        .close-btn:hover { background: #000; }
     </style>
 </head>
 <body>
+
+    <h1>🗺️ Mapa de Logística Interactivo</h1>
 
     <div class="map-container">
         <img src="mapas.png" class="map-image">
@@ -66,25 +85,36 @@
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
-        <div class="modal-header" id="m-title"></div>
-        <div class="modal-body" id="m-body"></div>
-        <button class="close-btn" onclick="closeModal()">CERRAR</button>
+        <div class="modal-header">
+            <h3 id="modal-pos"></h3>
+            <p id="modal-name"></p>
+        </div>
+        <div class="modal-body">
+            <strong>📋 Función y Responsabilidades:</strong>
+            <p id="modal-desc"></p>
+        </div>
+        <button class="close-btn" onclick="closeModal()">ENTENDIDO</button>
     </div>
 
     <script>
+        // Datos unificados con tu lista completa
         const data = {
-            1: { t: "Puesto 1: Supervisor Derecho", d: "Laura Daniela Arias Fontecha. Supervisa zonas 1, 2, 3 y 4. Realiza check-in y coordina voluntarios." },
-            2: { t: "Puesto 2: Zona 1", d: "Rafael Moncaleano / Gloria Parra. Ubicación de abajo hacia arriba. Papás SPK." },
-            3: { t: "Puesto 3: Zona 2 Abajo", d: "Marleny Masmela. Reserva sillas alabanza. Dirige salida de nuevos." },
-            13: { t: "Puesto 13: Zona 4 Derecha", d: "Jose Carrillo. Responsable de zona. Ubica capas de lluvia." },
-            26: { t: "Puesto 26: Zona 6 Arriba", d: "Arnulfo Canchila. Dirige hacia parte superior. Salida por rampa Betel." }
-            // Los demás datos se mantienen igual...
+            1: { pos: "1 - Supervisor Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Supervisa zonas 1, 2, 3 y 4. Responsable de check-in, uniformes, actitud y conocimiento de lazos. Coordina ingresos/salidas y reservas de sillas." },
+            2: { pos: "2 - ZONA 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba. Reservado para papás SPK en fin de semana. Sostiene cuerda abajo tras salida de zona 3. Coloca forros negros en 1ra fila." },
+            3: { pos: "3 - ZONA 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila de paso. Dirige a zona 1. Reserva sillas para alabanza. Coloca capas de lluvia. En salida sostiene lazo arriba para población prioritaria." },
+            4: { pos: "4 - ZONA 2 Abajo", radio: false, name: "Edith Mayerly Pertuz Aviles", desc: "Apoya acomodación. Coloca carita feliz a nuevos. Saca las últimas 4 filas por rampa lateral en la salida." },
+            5: { pos: "5 - ZONA 2 Arriba", radio: true, name: "Carlos Julio González Martínez", desc: "Responsable de ingreso. Gestiona reserva de Traducción y Papás SPK. Coloca forros negros (baranda, servidor y arriba)." },
+            9: { pos: "9 - Semáforo Escalera Derecha", radio: false, name: "Marcela Eugenia Paez Cervantes", desc: "Controla flujo a baños con puerta de vidrio para evitar doble vía. En la salida hace la 'L' con el lazo para ampliar flujo." },
+            13: { pos: "13 - ZONA 4 Derecha", radio: true, name: "Jose Guillermo Carrillo Ballesteros", desc: "Responsable de zona. Ubicación abajo hacia arriba. Capas de lluvia alternadas. Coordina salida con centro derecho." },
+            17: { pos: "17 - ZONA 5 Abajo", radio: true, name: "Sonia Patricia López Mora", desc: "Dirige asistentes por rampa zona 6. Ubica prioritarios y sillas de ruedas en 1ra fila. Sostiene lazo arriba en la salida." },
+            26: { pos: "26 - ZONA 6 Arriba", radio: true, name: "Arnulfo Enrique Canchila Herrera", desc: "Dirige asistentes hacia arriba. En salida se ubica abajo. Gestiona salida de nuevos por rampa Betel con carita feliz." }
         };
 
         function showInfo(id) {
-            const item = data[id] || { t: `Puesto ${id}`, d: "Información de función pendiente." };
-            document.getElementById('m-title').innerText = item.t;
-            document.getElementById('m-body').innerText = item.d;
+            const info = data[id] || { pos: `Puesto ${id}`, name: "En Revisión", desc: "Detalles logísticos pendientes de asignar." };
+            document.getElementById('modal-pos').innerHTML = info.pos + (info.radio ? ' <span class="radio-badge">📻 RADIO</span>' : '');
+            document.getElementById('modal-name').innerText = "Responsable: " + info.name;
+            document.getElementById('modal-desc').innerText = info.desc;
             document.getElementById('modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
