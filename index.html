@@ -3,83 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Logística Interactivo</title>
+    <title>Logística Auditorio - Interactivo</title>
     <style>
-        body { font-family: sans-serif; margin: 0; display: flex; justify-content: center; background: #f0f2f5; }
-        .map-container { position: relative; max-width: 1000px; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .map-image { width: 100%; display: block; border-radius: 8px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
+        h1 { margin: 20px 0; font-weight: 300; }
+        .map-container { position: relative; width: 95%; max-width: 1200px; border: 2px solid #444; border-radius: 10px; overflow: hidden; background: white; }
+        .map-image { width: 100%; display: block; }
         
-        /* Los puntos interactivos */
+        /* Estilo de los puntos interactivos (puedes ajustar el tamaño aquí) */
         .dot {
             position: absolute;
-            width: 25px;
-            height: 25px;
-            background: rgba(255, 69, 0, 0.4); /* Color naranja semi-transparente */
-            border: 2px solid orangered;
+            width: 2.2%; 
+            height: 4%;
+            background: rgba(255, 85, 0, 0.3);
+            border: 1px solid #ff5500;
             border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: all 0.3s ease;
+            z-index: 10;
         }
-        .dot:hover { transform: scale(1.3); background: rgba(255, 69, 0, 0.8); }
+        .dot:hover { background: rgba(255, 85, 0, 0.8); transform: scale(1.5); box-shadow: 0 0 15px #ff5500; }
 
-        /* El Pop-up (Modal) */
-        #modal {
-            display: none;
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1000;
-            width: 300px;
-            text-align: center;
-        }
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 999;
-        }
-        .close-btn { background: #333; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+        /* Modal / Pop-up */
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; padding: 30px; border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 1000; width: 320px; text-align: center; border-top: 8px solid #ff5500; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; backdrop-filter: blur(3px); }
+        .close-btn { background: #ff5500; color: white; border: none; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .close-btn:hover { background: #e64d00; }
     </style>
 </head>
 <body>
 
-<div class="map-container">
-    <img src="tu-mapa.png" class="map-image" id="mapa">
+    <h1>🗺️ Mapa de Logística Interactivo</h1>
 
-    <div class="dot" style="top: 15%; left: 75%;" onclick="showInfo(1)"></div> <div class="dot" style="top: 15%; left: 45%;" onclick="showInfo(13)"></div> <div class="dot" style="top: 8%; left: 18%;" onclick="showInfo(26)"></div> </div>
+    <div class="map-container">
+        <img src="mapas.png" class="map-image">
 
-<div id="overlay" onclick="closeModal()"></div>
-<div id="modal">
-    <h2 id="modal-title"></h2>
-    <p id="modal-desc"></p>
-    <button class="close-btn" onclick="closeModal()">Cerrar</button>
-</div>
+        <div class="dot" style="top: 22%; left: 74.5%;" onclick="showInfo(2)"></div>
+        <div class="dot" style="top: 36.5%; left: 81.3%;" onclick="showInfo(4)"></div>
+        <div class="dot" style="top: 39%; left: 89.2%;" onclick="showInfo(3)"></div>
+        <div class="dot" style="top: 41%; left: 72.3%;" onclick="showInfo(5)"></div>
+        <div class="dot" style="top: 64%; left: 76.5%;" onclick="showInfo(6)"></div>
+        <div class="dot" style="top: 87.5%; left: 81.2%;" onclick="showInfo(7)"></div>
+        <div class="dot" style="top: 45.5%; left: 69.5%;" onclick="showInfo(8)"></div>
+        <div class="dot" style="top: 55.5%; left: 71.3%;" onclick="showInfo(9)"></div>
+        <div class="dot" style="top: 61.5%; left: 71.5%;" onclick="showInfo(10)"></div>
+        <div class="dot" style="top: 71%; left: 70.3%;" onclick="showInfo(11)"></div>
+        <div class="dot" style="top: 88%; left: 72.5%;" onclick="showInfo(12)"></div>
+        <div class="dot" style="top: 21%; left: 45.2%;" onclick="showInfo(13)"></div>
+        <div class="dot" style="top: 45.5%; left: 47.3%;" onclick="showInfo(14)"></div>
+        <div class="dot" style="top: 55%; left: 46.5%;" onclick="showInfo(15)"></div>
+        <div class="dot" style="top: 62.5%; left: 45.8%;" onclick="showInfo(16)"></div>
+        <div class="dot" style="top: 70%; left: 45.8%;" onclick="showInfo(17)"></div>
+        <div class="dot" style="top: 87.5%; left: 45.1%;" onclick="showInfo(18)"></div>
+        <div class="dot" style="top: 15%; left: 37.5%;" onclick="showInfo(23)"></div>
+        <div class="dot" style="top: 21.5%; left: 41.5%;" onclick="showInfo(19)"></div>
+        <div class="dot" style="top: 40%; left: 28.8%;" onclick="showInfo(24)"></div>
+        <div class="dot" style="top: 48%; left: 22.5%;" onclick="showInfo(25)"></div>
+        <div class="dot" style="top: 21.5%; left: 17.8%;" onclick="showInfo(26)"></div>
+        <div class="dot" style="top: 58%; left: 9.3%;" onclick="showInfo(27)"></div>
+        <div class="dot" style="top: 61%; left: 24.2%;" onclick="showInfo(28)"></div>
+        <div class="dot" style="top: 76%; left: 13.8%;" onclick="showInfo(29)"></div>
+        <div class="dot" style="top: 88%; left: 33.3%;" onclick="showInfo(30)"></div>
+    </div>
 
-<script>
-    // AQUÍ ES DONDE CAMBIAS LA INFORMACIÓN FÁCILMENTE
-    const data = {
-        1: { title: "ID 1: Zona Derecha", desc: "Responsable: Luis R. <br> Tarea: Supervisar fila 1 y entrada principal." },
-        13: { title: "ID 13: Tarima Central", desc: "Responsable: Coordinador General. <br> Tarea: Gestión de audio y tiempos de tarima." },
-        26: { title: "ID 26: Salida Eléctrica", desc: "Responsable: Seguridad. <br> Tarea: Control de flujo en escaleras eléctricas." }
-    };
+    <div id="overlay" onclick="closeModal()"></div>
+    <div id="modal">
+        <h2 id="modal-title"></h2>
+        <hr>
+        <p id="modal-desc"></p>
+        <button class="close-btn" onclick="closeModal()">Entendido</button>
+    </div>
 
-    function showInfo(id) {
-        document.getElementById('modal-title').innerText = data[id].title;
-        document.getElementById('modal-desc').innerHTML = data[id].desc;
-        document.getElementById('modal').style.display = 'block';
-        document.getElementById('overlay').style.display = 'block';
-    }
+    <script>
+        const data = {
+            2: { title: "ID 2: Escalera Superior", desc: "<b>Responsable:</b> Por asignar <br><b>Tarea:</b> Controlar flujo de entrada." },
+            4: { title: "ID 4: Pasillo Zona 1", desc: "<b>Responsable:</b> Voluntario A <br><b>Tarea:</b> Acomodación rápida." },
+            13: { title: "ID 13: Acceso Tarima", desc: "<b>Responsable:</b> Staff Seguridad <br><b>Tarea:</b> Verificar escarapelas VIP." },
+            26: { title: "ID 26: Salida Eléctrica", desc: "<b>Responsable:</b> Logística General <br><b>Tarea:</b> Mantener escaleras despejadas." },
+            30: { title: "ID 30: Salida Emergencia", desc: "<b>Responsable:</b> Seguridad <br><b>Tarea:</b> Punto de evacuación sur." }
+            // Agrega aquí los demás IDs siguiendo el mismo formato
+        };
 
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-        document.getElementById('overlay').style.display = 'none';
-    }
-</script>
+        function showInfo(id) {
+            const info = data[id] || { title: `ID ${id}`, desc: "Información pendiente por cargar en la base de datos." };
+            document.getElementById('modal-title').innerText = info.title;
+            document.getElementById('modal-desc').innerHTML = info.desc;
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
 
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
