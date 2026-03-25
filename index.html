@@ -7,56 +7,55 @@
     <style>
         :root { --primary: #ff5500; --sup: #d00000; --bg: #0f0f0f; --panel: #1a1a1a; }
         * { box-sizing: border-box; }
-        body { font-family: sans-serif; margin: 0; background: var(--bg); color: white; height: 100vh; display: flex; overflow: hidden; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: white; height: 100vh; display: flex; overflow: hidden; }
 
-        /* Sidebar */
+        /* Sidebar Responsiva */
         .sidebar { width: 260px; background: #000; border-right: 1px solid #333; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
-        .menu-item { padding: 15px 20px; cursor: pointer; color: #888; border-left: 4px solid transparent; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #222; font-weight: bold; color: var(--primary); }
+        .menu-item { padding: 15px 20px; cursor: pointer; color: #888; border-left: 4px solid transparent; transition: 0.2s; }
         .menu-item:hover { background: #111; color: white; }
         .menu-item.active { background: #1a1a1a; color: white; border-left-color: var(--primary); font-weight: bold; }
 
-        /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
+        /* Contenido Principal */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
         .top-bar { height: 60px; background: var(--panel); display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #333; }
         
-        /* Contenedor del Mapa RESPONSIVO */
-        .map-viewport { flex: 1; overflow: auto; background: #000; position: relative; padding: 10px; }
-        .map-container { position: relative; margin: 0 auto; width: 100%; max-width: 1200px; } /* Desktop: Máximo 1200px */
-        .map-img { width: 100%; height: auto; display: block; border-radius: 5px; }
+        /* Contenedor del Mapa al 100% sin scroll */
+        .map-viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; overflow: hidden; }
+        .map-container { position: relative; width: 100%; max-width: 1000px; line-height: 0; }
+        .map-img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
 
-        /* Pines */
+        /* Pines Proporcionales */
         .pin {
-            position: absolute; width: 24px; height: 24px; border-radius: 50%;
+            position: absolute; width: 22px; height: 22px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
             color: white; border: 1.5px solid #fff; transform: translate(-50%, -50%);
-            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.8); z-index: 10;
+            cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-        .pin-sup { background: var(--sup); border-radius: 4px; }
+        .pin-sup { background: var(--sup); border-radius: 4px; width: 24px; height: 24px; }
         .pin-vol { background: var(--primary); }
 
-        /* Modal Inferior (Estilo App) */
+        /* Modal / Drawer Inferior */
         #modal { 
             position: fixed; bottom: 0; left: 0; right: 0; background: white; color: #111;
             padding: 25px; border-radius: 20px 20px 0 0; transform: translateY(100%);
-            transition: transform 0.3s ease; z-index: 2000; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000;
         }
         #modal.open { transform: translateY(0); }
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1500; }
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 1500; }
 
-        /* Ajustes para Móvil */
+        /* Media Queries */
         @media (max-width: 768px) {
             .sidebar { position: fixed; left: -260px; height: 100%; }
             .sidebar.open { left: 0; }
-            /* En móvil permitimos que el mapa sea más ancho que la pantalla para que los puntos respiren */
-            .map-container { width: 1000px; } 
-            .map-viewport { -webkit-overflow-scrolling: touch; }
+            .pin { width: 26px; height: 26px; font-size: 11px; } /* Más grandes para dedo en móvil */
         }
     </style>
 </head>
 <body>
 
     <nav class="sidebar" id="sidebar">
-        <div style="padding: 20px; color: var(--primary); font-weight: bold; border-bottom: 1px solid #222;">LOGÍSTICA AUDITORIO</div>
+        <div class="sidebar-header">LOGÍSTICA AUDITORIO</div>
         <div class="menu">
             <div class="menu-item active" onclick="loadView('general')">Mapa General</div>
             <div class="menu-item" onclick="loadView('z1')">Zona 1</div>
@@ -70,12 +69,12 @@
 
     <main class="main">
         <div class="top-bar">
-            <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; margin-right: 15px;">☰</button>
-            <span id="view-title" style="font-weight: bold;">MAPA GENERAL</span>
+            <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">☰</button>
+            <span id="view-title" style="margin-left: 15px; font-weight: bold; font-size: 0.9rem;">MAPA GENERAL</span>
         </div>
 
         <div class="map-viewport">
-            <div class="map-container">
+            <div class="map-container" id="map-frame">
                 <img src="mapas.png" id="main-map" class="map-img">
                 <div id="pins-layer"></div>
             </div>
@@ -84,53 +83,63 @@
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
+        <div style="width: 40px; height: 4px; background: #ddd; margin: -10px auto 15px; border-radius: 2px;"></div>
         <h3 id="m-pos" style="margin:0; color:var(--primary);"></h3>
-        <p id="m-name" style="font-weight:bold; margin:10px 0;"></p>
-        <p id="m-task" style="color:#555; font-size:0.9rem;"></p>
-        <button onclick="closeModal()" style="width:100%; padding:12px; background:#111; color:white; border:none; border-radius:8px; margin-top:10px;">CERRAR</button>
+        <p id="m-name" style="font-weight:bold; margin:10px 0; font-size: 1.1rem;"></p>
+        <p id="m-task" style="color:#666; font-size:0.95rem; line-height:1.4;"></p>
+        <button onclick="closeModal()" style="width:100%; padding:14px; background:#111; color:white; border:none; border-radius:10px; margin-top:15px; font-weight:bold;">CERRAR</button>
     </div>
 
     <script>
-        const config = {
+        // JSON de configuración centralizado
+        const appData = {
             views: {
                 general: { img: 'mapas.png', title: 'MAPA GENERAL', filter: 'all' },
-                z1: { img: 'zona1.png', title: 'ZONA 1', filter: [1, 2] },
-                z6: { img: 'zona6.png', title: 'ZONA 6', filter: [24, 25, 26, 27, 28] }
+                z1: { img: 'zona1.png', title: 'DETALLE ZONA 1', filter: [1, 2, 3, 4] },
+                z6: { img: 'zona6.png', title: 'DETALLE ZONA 6', filter: [26, 27, 28] }
+                // Agrega el resto de zonas aquí
             },
-            // Coordenadas fijas basadas en tu imagen guía
+            // Coordenadas basadas en image_cefc10.jpg
             positions: [
-                {id: 1, t: 22, l: 72, type: 'sup', name: 'Laura Arias', task: 'Supervisor Derecho.'},
-                {id: 2, t: 6, l: 77.5, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Flujo entrada.'},
-                {id: 16, t: 21, l: 51.5, type: 'sup', name: 'Juan Castrillón', task: 'Supervisor Izquierdo.'},
-                {id: 26, t: 30, l: 17.5, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Rampa.'},
-                {id: 28, t: 12, l: 12.5, type: 'vol', name: 'Voluntario 28', task: 'Zona 6: Emergencias.'}
-                // (He incluido aquí los ejemplos, rellena hasta el 28 con los % de antes)
+                {id: 1, t: 22.5, l: 72.5, type: 'sup', name: 'Laura Arias', task: 'Supervisor Derecho. Coordina acceso principal.'},
+                {id: 2, t: 5.8, l: 77.8, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Orientación inicial.'},
+                {id: 16, t: 21.2, l: 51.5, type: 'sup', name: 'Juan Castrillón', task: 'Supervisor Izquierdo. Coordina rampas.'},
+                {id: 26, t: 29.5, l: 17.8, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Flujo Rampa Betel.'},
+                {id: 28, t: 11.5, l: 12.2, type: 'vol', name: 'Voluntario 28', task: 'Salida emergencias.'}
             ]
         };
 
-        // Rellenar dinámicamente el resto de los 28 puntos para asegurar que no falten
+        // Generador de puntos automáticos para completar los 28 (puedes borrarlos cuando llenes los reales)
         for(let i=1; i<=28; i++) {
-            if(!config.positions.find(p => p.id === i)) {
-                config.positions.push({id: i, t: 40, l: 40, type: 'vol', name: 'Asignado', task: 'Logística de zona.'});
+            if(!appData.positions.find(p => p.id === i)) {
+                appData.positions.push({id: i, t: 45, l: 45, type: 'vol', name: 'Personal Asignado', task: 'Logística de evento.'});
             }
         }
 
         function loadView(key) {
-            const v = config.views[key] || config.views.general;
+            const v = appData.views[key] || appData.views.general;
             document.getElementById('main-map').src = v.img;
             document.getElementById('view-title').innerText = v.title;
             
+            // Cerrar menú en mobile
             if(window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
             
+            // UI menú activo
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            if(event) event.currentTarget.classList.add('active');
+
             const layer = document.getElementById('pins-layer');
             layer.innerHTML = '';
 
-            config.positions.forEach(p => {
+            appData.positions.forEach(p => {
                 if(v.filter === 'all' || v.filter.includes(p.id)) {
                     const div = document.createElement('div');
                     div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
+                    
+                    // Aquí es donde sucede la magia: top y left son % relativos al mapa actual
                     div.style.top = p.t + '%';
                     div.style.left = p.l + '%';
+                    
                     div.innerText = p.id;
                     div.onclick = () => showInfo(p);
                     layer.appendChild(div);
@@ -151,6 +160,7 @@
             document.getElementById('overlay').style.display = 'none';
         }
 
+        // Carga inicial
         window.onload = () => loadView('general');
     </script>
 </body>
