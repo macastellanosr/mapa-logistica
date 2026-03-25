@@ -5,126 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logística Auditorio - Mapa de Posiciones</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; }
+        h1 { margin: 25px 0 10px 0; font-weight: 300; letter-spacing: 1px; color: #eee; text-align: center; }
         
-        h1 { margin: 25px 0; font-weight: 300; letter-spacing: 1px; color: #eee; text-align: center; }
-        
+        /* Contenedor del Mapa */
         .map-container { position: relative; width: 95%; max-width: 1100px; border: 2px solid #444; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .map-image { width: 100%; display: block; }
 
-        /* Pines con ID visible - Estilo Premium */
+        /* Estilo de los Pines Numerados */
         .pin {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            background: #ff5500;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            border: 2px solid #fff;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-            transition: all 0.3s ease;
-            z-index: 10;
+            position: absolute; width: 24px; height: 24px; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
+            cursor: pointer; border: 2px solid #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.4); transition: all 0.3s ease; z-index: 10;
         }
-        .pin:hover { transform: scale(1.3); background: #e64d00; box-shadow: 0 0 15px #ff5500; }
+        .pin:hover { transform: scale(1.3); box-shadow: 0 0 15px rgba(255,255,255,0.5); }
 
-        /* Modal / Pop-up con estilo elegante */
+        /* Colores por Rol */
+        .pin-sup { background: #d00000; } /* Supervisores en Rojo */
+        .pin-vol { background: #ff5500; } /* Voluntarios en Naranja */
+
+        /* Leyenda */
+        .legend { display: flex; gap: 20px; margin-top: 15px; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 30px; border: 1px solid #444; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.9em; }
+        .dot-l { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #fff; }
+
+        /* Modal Premium */
         #modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            background: #fff; color: #333; padding: 0; border-radius: 15px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7); z-index: 1000; width: 90%; max-width: 420px; 
-            max-height: 80vh; overflow-y: auto; border-top: 10px solid #ff5500; 
+            background: #fff; color: #333; border-radius: 15px; z-index: 1000; width: 90%; max-width: 420px; 
+            max-height: 80vh; overflow-y: auto; border-top: 10px solid #ff5500; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
-        
         .modal-header { background: #f8f8f8; padding: 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; }
         .modal-header h3 { margin: 0; color: #ff5500; font-size: 1.2em; }
-        .modal-header p { margin: 5px 0 0 0; font-weight: bold; color: #555; font-size: 0.9em; }
-        
         .modal-body { padding: 20px; line-height: 1.6; font-size: 0.95em; color: #444; }
         .radio-badge { background: #ff5500; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7em; vertical-align: middle; margin-left: 10px; }
-        
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                   background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(4px); }
-        
-        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; 
-                     cursor: pointer; font-weight: bold; font-size: 1em; transition: background 0.2s; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(4px); }
+        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 0 0 15px 15px; }
     </style>
 </head>
 <body>
 
-    <h1>🗺️ Mapa Auditorio Principal</h1>
+    <h1>🗺️ Auditorio Principal: Logística</h1>
 
-    <div class="map-container">
+    <div class="legend">
+        <div class="legend-item"><div class="dot-l" style="background:#d00000;"></div> Supervisor</div>
+        <div class="legend-item"><div class="dot-l" style="background:#ff5500;"></div> Voluntario</div>
+    </div>
+
+    <div class="map-container" style="margin-top: 20px;">
         <img src="mapas.png" class="map-image">
 
-        <div class="pin" style="top: 15%; left: 72%;" onclick="showInfo(1)">1</div>
-        <div class="pin" style="top: 5%; left: 81%;" onclick="showInfo(2)">2</div>
-        <div class="pin" style="top: 25%; left: 75%;" onclick="showInfo(3)">3</div>
-        <div class="pin" style="top: 18%; left: 79%;" onclick="showInfo(4)">4</div>
-        <div class="pin" style="top: 45%; left: 80%;" onclick="showInfo(5)">5</div>
-        <div class="pin" style="top: 68%; left: 83%;" onclick="showInfo(6)">6</div>
-        <div class="pin" style="top: 22%; left: 70%;" onclick="showInfo(7)">7</div>
-        <div class="pin" style="top: 36%; left: 71%;" onclick="showInfo(8)">8</div>
-        <div class="pin" style="top: 47%; left: 73.5%;" onclick="showInfo(9)">9</div>
-        <div class="pin" style="top: 32%; left: 51%;" onclick="showInfo(10)">10</div>
-        <div class="pin" style="top: 50%; left: 49%;" onclick="showInfo(11)">11</div>
-        <div class="pin" style="top: 65%; left: 71%;" onclick="showInfo(12)">12</div>
-        <div class="pin" style="top: 80%; left: 71%;" onclick="showInfo(13)">13</div>
+        <div class="pin pin-sup" style="top: 15%; left: 72%;" onclick="showInfo(1)">1</div>
+        <div class="pin pin-vol" style="top: 5%; left: 81%;" onclick="showInfo(2)">2</div>
+        <div class="pin pin-vol" style="top: 25%; left: 75%;" onclick="showInfo(3)">3</div>
+        <div class="pin pin-vol" style="top: 18%; left: 79%;" onclick="showInfo(4)">4</div>
+        <div class="pin pin-vol" style="top: 45%; left: 80%;" onclick="showInfo(5)">5</div>
+        <div class="pin pin-vol" style="top: 68%; left: 83%;" onclick="showInfo(6)">6</div>
+        <div class="pin pin-vol" style="top: 22%; left: 70%;" onclick="showInfo(7)">7</div>
+        <div class="pin pin-vol" style="top: 36%; left: 71%;" onclick="showInfo(8)">8</div>
+        <div class="pin pin-vol" style="top: 47%; left: 73.5%;" onclick="showInfo(9)">9</div>
+        <div class="pin pin-vol" style="top: 32%; left: 51%;" onclick="showInfo(10)">10</div>
+        <div class="pin pin-vol" style="top: 50%; left: 49%;" onclick="showInfo(11)">11</div>
+        <div class="pin pin-vol" style="top: 65%; left: 71%;" onclick="showInfo(12)">12</div>
+        <div class="pin pin-vol" style="top: 80%; left: 71%;" onclick="showInfo(13)">13</div>
 
-        <div class="pin" style="top: 65%; left: 49%;" onclick="showInfo(14)">14</div>
-        <div class="pin" style="top: 83%; left: 47%;" onclick="showInfo(15)">15</div>
-        <div class="pin" style="top: 16%; left: 51%;" onclick="showInfo(16)">16</div>
-        <div class="pin" style="top: 25%; left: 47%;" onclick="showInfo(17)">17</div>
-        <div class="pin" style="top: 42%; left: 45%;" onclick="showInfo(18)">18</div>
-        <div class="pin" style="top: 48%; left: 40%;" onclick="showInfo(19)">19</div>
-        <div class="pin" style="top: 55%; left: 35.5%;" onclick="showInfo(20)">20</div>
-        <div class="pin" style="top: 64%; left: 13.5%;" onclick="showInfo(21)">21</div>
-        <div class="pin" style="top: 76%; left: 14.5%;" onclick="showInfo(22)">22</div>
-        <div class="pin" style="top: 85%; left: 9.5%;" onclick="showInfo(23)">23</div>
-        <div class="pin" style="top: 10%; left: 39%;" onclick="showInfo(24)">24</div>
-        <div class="pin" style="top: 18%; left: 34%;" onclick="showInfo(25)">25</div>
-        <div class="pin" style="top: 32%; left: 16.5%;" onclick="showInfo(26)">26</div>
-        <div class="pin" style="top: 42%; left: 10.5%;" onclick="showInfo(27)">27</div>
-        <div class="pin" style="top: 10%; left: 9.5%;" onclick="showInfo(28)">28</div>
+        <div class="pin pin-sup" style="top: 16%; left: 51%;" onclick="showInfo(16)">16</div>
+        <div class="pin pin-vol" style="top: 25%; left: 47%;" onclick="showInfo(17)">17</div>
+        <div class="pin pin-vol" style="top: 42%; left: 45%;" onclick="showInfo(18)">18</div>
+        <div class="pin pin-vol" style="top: 48%; left: 40%;" onclick="showInfo(19)">19</div>
+        <div class="pin pin-vol" style="top: 55%; left: 35.5%;" onclick="showInfo(20)">20</div>
+        <div class="pin pin-vol" style="top: 10%; left: 39%;" onclick="showInfo(24)">24</div>
+        <div class="pin pin-vol" style="top: 18%; left: 34%;" onclick="showInfo(25)">25</div>
+        <div class="pin pin-vol" style="top: 32%; left: 16.5%;" onclick="showInfo(26)">26</div>
+        <div class="pin pin-vol" style="top: 42%; left: 10.5%;" onclick="showInfo(27)">27</div>
+        <div class="pin pin-vol" style="top: 10%; left: 9.5%;" onclick="showInfo(28)">28</div>
     </div>
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
         <div class="modal-header">
             <h3 id="modal-pos"></h3>
-            <p id="modal-name"></p>
+            <p id="modal-name" style="margin: 5px 0 0 0; font-weight: bold; color: #666;"></p>
         </div>
-        <div class="modal-body">
-            <strong>📋 Función y Responsabilidades:</strong>
-            <div id="modal-desc" style="margin-top: 10px;"></div>
-        </div>
-        <button class="close-btn" onclick="closeModal()">ENTENDIDO</button>
+        <div class="modal-body" id="modal-desc"></div>
+        <button class="close-btn" onclick="closeModal()">CERRAR FICHA</button>
     </div>
 
     <script>
         const data = {
-            1: { pos: "1 - Supervisor Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Supervisa zonas 1, 2, 3 y 4. Responsable de check-in, uniformes y actitud. Coordina ingresos/salidas y reservas de sillas." },
-            2: { pos: "2 - Zona 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba. Reservado para papás SPK. Sostiene cuerda abajo tras salida de zona 3." },
-            3: { pos: "3 - Zona 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila de paso. Dirige a zona 1. Reserva sillas para alabanza. Coloca capas de lluvia." },
-            4: { pos: "4 - Zona 2 Abajo", radio: false, name: "Edith Mayerly Pertuz Aviles", desc: "Apoya acomodación. Coloca carita feliz a nuevos. Saca últimas 4 filas por rampa lateral en salida." },
-            5: { pos: "5 - Zona 2 Arriba", radio: true, name: "Carlos Julio González Martínez", desc: "Responsable de ingreso. Gestiona reserva de Traducción. Coloca forros negros (baranda, servidor y arriba)." },
-            7: { pos: "7 - Zona 3 Derecha", radio: true, name: "Maritriny Barrera de Lopez", desc: "Responsable de zona. Ingreso hacia lado izquierdo. Reservas de Comité y Staff. Salida alterna: una fila derecha, otra izquierda." },
-            9: { pos: "9 - Semáforo Escalera Derecha", radio: false, name: "Marcela Eugenia Paez Cervantes", desc: "Controla flujo a baños con puerta de vidrio. En la salida hace la 'L' con el lazo para ampliar flujo." },
-            10: { pos: "10 - Zona 3 Izquierda", radio: true, name: "Myriam Rojas Sandoval", desc: "Responsable de zona. Primeras filas para líderes. Salida alterna arriba hacia abajo. Dirige a nuevos al Centro." },
-            13: { pos: "13 - Zona 4 Derecha", radio: false, name: "Marisol Cubillos Pedraza", desc: "Apoya logística de la zona. Atento a salida de nuevos (carita feliz). Sostiene lazo arriba en salida." },
-            16: { pos: "16 - Supervisor Izquierdo", radio: true, name: "Juan Carlos Castrillon", desc: "Supervisa zonas 5 y 6. Responsable de posiciones 16 al 30. Controla flujo en rampas y caracol del lobby." },
-            17: { pos: "17 - Zona 5 Abajo", radio: true, name: "Sonia Patricia López Mora", desc: "Dirige asistentes por rampa zona 6. Ubica prioritarios y sillas de ruedas en 1ra fila. Sostiene lazo arriba." },
-            24: { pos: "24 - Zona 6 Abajo", radio: false, name: "Martha Lucía Ceballos", desc: "Ubicación abajo hacia arriba. Sostiene cuerda abajo. Coordina salida por escalera interna." },
-            26: { pos: "26 - Zona 6 Arriba", radio: true, name: "Arnulfo Enrique Canchila", desc: "Zona extensa: dirige hacia arriba. Salida por rampa Betel con carita feliz." }
+            1: { pos: "1 - Supervisor Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Supervisa zonas 1-4. Realiza check-in, verifica uniformes y conocimiento de lazos. Gestiona reservas y situaciones especiales." },
+            2: { pos: "2 - Zona 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba. Fin de semana: Papás SPK. Sostiene cuerda abajo tras salida zona 3." },
+            3: { pos: "3 - Zona 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila de paso. Reserva sillas alabanza. Sostiene lazo arriba en salida (prioritarios primero)." },
+            7: { pos: "7 - Zona 3 Derecha", radio: true, name: "Maritriny Barrera", desc: "Ingreso hacia lado izquierdo. Reservas Staff/Líderes. Salida alterna: una fila derecha, otra izquierda." },
+            9: { pos: "9 - Semáforo Escalera", radio: false, name: "Marcela Páez", desc: "Control de flujo a baños. En la salida hace la 'L' con el lazo para ampliar la vía." },
+            16: { pos: "16 - Supervisor Izquierdo", radio: true, name: "Juan Carlos Castrillón", desc: "Supervisa zonas 5-6. Controla flujo en rampas y caracol del lobby. Gestión de prioritarios y relevos." },
+            17: { pos: "17 - Zona 5 Abajo", radio: true, name: "Sonia Patricia López", desc: "Dirige asistentes por rampa zona 6. Ubica prioritarios (1ra fila). Sostiene lazo arriba en salida." },
+            19: { pos: "19 - Zona 5", radio: true, name: "July Jiménez", desc: "Ingreso por rampa. Coloca 3 forros negros. En salida coordina con centro izquierdo el envío de filas." },
+            24: { pos: "24 - Zona 6 Abajo", radio: false, name: "Martha Lucía Ceballos", desc: "Ubicación abajo hacia arriba. Coordina salida por escalera interna tras zona 8." },
+            26: { pos: "26 - Zona 6 Arriba", radio: true, name: "Arnulfo Canchila", desc: "Zona extensa: dirige hacia arriba. Salida de nuevos por rampa Betel con carita feliz." }
         };
 
         function showInfo(id) {
-            const info = data[id] || { pos: `Puesto ${id}`, name: "En Revisión", desc: "Información pendiente de asignación en la base de datos." };
+            const info = data[id] || { pos: `Puesto ${id}`, name: "Asignación Pendiente", desc: "Función en proceso de revisión." };
             document.getElementById('modal-pos').innerHTML = info.pos + (info.radio ? ' <span class="radio-badge">📻 RADIO</span>' : '');
             document.getElementById('modal-name').innerText = "Responsable: " + info.name;
             document.getElementById('modal-desc').innerText = info.desc;
