@@ -2,79 +2,95 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Logística Auditorio Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística Auditorio - Panel de Control</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #ff5500; --sup: #d00000; --bg: #0f0f0f; --panel: #1a1a1a; }
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: white; height: 100vh; display: flex; overflow: hidden; }
-
-        /* Sidebar Responsiva */
-        .sidebar { width: 260px; background: #000; border-right: 1px solid #333; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid #222; font-weight: bold; color: var(--primary); }
-        .menu-item { padding: 15px 20px; cursor: pointer; color: #888; border-left: 4px solid transparent; transition: 0.2s; }
-        .menu-item:hover { background: #111; color: white; }
-        .menu-item.active { background: #1a1a1a; color: white; border-left-color: var(--primary); font-weight: bold; }
-
-        /* Contenido Principal */
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-        .top-bar { height: 60px; background: var(--panel); display: flex; align-items: center; padding: 0 15px; border-bottom: 1px solid #333; }
+        :root { --primary: #ff5500; --sup: #d00000; --bg: #111; --panel: #1a1a1a; }
         
-        /* Contenedor del Mapa al 100% sin scroll */
-        .map-viewport { flex: 1; position: relative; display: flex; justify-content: center; align-items: flex-start; padding: 10px; overflow: hidden; }
-        .map-container { position: relative; width: 100%; max-width: 1000px; line-height: 0; }
-        .map-img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        body { font-family: 'Inter', system-ui, sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
 
-        /* Pines Proporcionales */
+        /* Sidebar Profesional */
+        .sidebar { width: 280px; background: #000; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 30px 20px; border-bottom: 1px solid #222; }
+        .sidebar-header h2 { font-size: 1.1rem; color: var(--primary); margin: 0; letter-spacing: 1px; }
+        
+        .menu { flex: 1; padding: 20px 0; }
+        .menu-item { padding: 14px 25px; cursor: pointer; color: #999; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .menu-item i { width: 20px; text-align: center; }
+        .menu-item:hover { background: #1a1a1a; color: white; }
+        .menu-item.active { background: #222; color: white; border-left: 4px solid var(--primary); font-weight: 600; }
+
+        /* Contenido */
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .top-bar { padding: 20px 30px; background: var(--panel); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        
+        .legend { display: flex; gap: 20px; font-size: 0.85rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+        /* Contenedor de Mapa */
+        .map-viewport { flex: 1; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: flex-start; background: #0a0a0a; }
+        .map-container { position: relative; display: inline-block; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-radius: 4px; }
+        .map-img { max-width: 100%; height: auto; display: block; }
+
+        /* Pines */
         .pin {
-            position: absolute; width: 22px; height: 22px; border-radius: 50%;
+            position: absolute; width: 24px; height: 24px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
-            color: white; border: 1.5px solid #fff; transform: translate(-50%, -50%);
-            cursor: pointer; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: white; border: 2px solid #fff; transform: translate(-50%, -50%);
+            cursor: pointer; transition: 0.2s; z-index: 10;
         }
-        .pin-sup { background: var(--sup); border-radius: 4px; width: 24px; height: 24px; }
+        .pin:hover { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 15px var(--primary); }
+        .pin-sup { background: var(--sup); border-radius: 4px; }
         .pin-vol { background: var(--primary); }
 
-        /* Modal / Drawer Inferior */
+        /* PopUp Clásico */
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; }
         #modal { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: white; color: #111;
-            padding: 25px; border-radius: 20px 20px 0 0; transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000;
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; color: #111; width: 90%; max-width: 400px; 
+            border-radius: 12px; z-index: 2001; overflow: hidden; animation: fadeIn 0.3s ease;
         }
-        #modal.open { transform: translateY(0); }
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(2px); z-index: 1500; }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        
+        .modal-header { padding: 20px; background: #f8f8f8; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .modal-body { padding: 30px; }
+        .close-btn { background: var(--bg); color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; }
 
-        /* Media Queries */
         @media (max-width: 768px) {
-            .sidebar { position: fixed; left: -260px; height: 100%; }
-            .sidebar.open { left: 0; }
-            .pin { width: 26px; height: 26px; font-size: 11px; } /* Más grandes para dedo en móvil */
+            .sidebar { display: none; } /* En móvil se puede reactivar el menu o dejarlo así por ahora */
         }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">LOGÍSTICA AUDITORIO</div>
-        <div class="menu">
-            <div class="menu-item active" onclick="loadView('general')">Mapa General</div>
-            <div class="menu-item" onclick="loadView('z1')">Zona 1</div>
-            <div class="menu-item" onclick="loadView('z2')">Zona 2</div>
-            <div class="menu-item" onclick="loadView('z3')">Zona 3</div>
-            <div class="menu-item" onclick="loadView('z4')">Zona 4</div>
-            <div class="menu-item" onclick="loadView('z5')">Zona 5</div>
-            <div class="menu-item" onclick="loadView('z6')">Zona 6</div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-map-location-dot"></i> SISTEMA AUDITORIO</h2>
         </div>
-    </nav>
+        <div class="menu">
+            <div class="menu-item active" onclick="loadView('general')"><i class="fa-solid fa-earth-americas"></i> Mapa General</div>
+            <div class="menu-item" onclick="loadView('z1')"><i class="fa-solid fa-1"></i> Zona 1</div>
+            <div class="menu-item" onclick="loadView('z2')"><i class="fa-solid fa-2"></i> Zona 2</div>
+            <div class="menu-item" onclick="loadView('z3')"><i class="fa-solid fa-3"></i> Zona 3</div>
+            <div class="menu-item" onclick="loadView('z4')"><i class="fa-solid fa-4"></i> Zona 4</div>
+            <div class="menu-item" onclick="loadView('z5')"><i class="fa-solid fa-5"></i> Zona 5</div>
+            <div class="menu-item" onclick="loadView('z6')"><i class="fa-solid fa-6"></i> Zona 6</div>
+        </div>
+    </aside>
 
     <main class="main">
-        <div class="top-bar">
-            <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">☰</button>
-            <span id="view-title" style="margin-left: 15px; font-weight: bold; font-size: 0.9rem;">MAPA GENERAL</span>
-        </div>
+        <header class="top-bar">
+            <h1 id="view-title" style="margin:0; font-size: 1.2rem; font-weight: 300;">Mapa General</h1>
+            <div class="legend">
+                <div class="legend-item"><div class="dot" style="background:var(--sup)"></div> Supervisor</div>
+                <div class="legend-item"><div class="dot" style="background:var(--primary)"></div> Voluntario</div>
+            </div>
+        </header>
 
         <div class="map-viewport">
-            <div class="map-container" id="map-frame">
+            <div class="map-container">
                 <img src="mapas.png" id="main-map" class="map-img">
                 <div id="pins-layer"></div>
             </div>
@@ -83,36 +99,38 @@
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
-        <div style="width: 40px; height: 4px; background: #ddd; margin: -10px auto 15px; border-radius: 2px;"></div>
-        <h3 id="m-pos" style="margin:0; color:var(--primary);"></h3>
-        <p id="m-name" style="font-weight:bold; margin:10px 0; font-size: 1.1rem;"></p>
-        <p id="m-task" style="color:#666; font-size:0.95rem; line-height:1.4;"></p>
-        <button onclick="closeModal()" style="width:100%; padding:14px; background:#111; color:white; border:none; border-radius:10px; margin-top:15px; font-weight:bold;">CERRAR</button>
+        <div class="modal-header">
+            <span id="m-id" style="font-weight: bold; color: var(--primary)"></span>
+            <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="modal-body">
+            <h2 id="m-name" style="margin: 0 0 10px 0; font-size: 1.4rem;"></h2>
+            <p id="m-desc" style="color: #666; line-height: 1.6; margin: 0;"></p>
+        </div>
+        <button class="close-btn" onclick="closeModal()">CERRAR PANEL</button>
     </div>
 
     <script>
-        // JSON de configuración centralizado
         const appData = {
             views: {
                 general: { img: 'mapas.png', title: 'MAPA GENERAL', filter: 'all' },
-                z1: { img: 'zona1.png', title: 'DETALLE ZONA 1', filter: [1, 2, 3, 4] },
-                z6: { img: 'zona6.png', title: 'DETALLE ZONA 6', filter: [26, 27, 28] }
-                // Agrega el resto de zonas aquí
+                z1: { img: 'zona1.png', title: 'ZONA 1 - ACCESO', filter: [1, 2, 3, 4] },
+                z6: { img: 'zona6.png', title: 'ZONA 6 - RAMPA', filter: [26, 27, 28, 24, 25] }
             },
-            // Coordenadas basadas en image_cefc10.jpg
+            // Coordenadas fijas de los 28 puntos
             positions: [
-                {id: 1, t: 22.5, l: 72.5, type: 'sup', name: 'Laura Arias', task: 'Supervisor Derecho. Coordina acceso principal.'},
-                {id: 2, t: 5.8, l: 77.8, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Orientación inicial.'},
-                {id: 16, t: 21.2, l: 51.5, type: 'sup', name: 'Juan Castrillón', task: 'Supervisor Izquierdo. Coordina rampas.'},
-                {id: 26, t: 29.5, l: 17.8, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Flujo Rampa Betel.'},
-                {id: 28, t: 11.5, l: 12.2, type: 'vol', name: 'Voluntario 28', task: 'Salida emergencias.'}
+                {id: 1, t: 22.5, l: 72.5, type: 'sup', name: 'Laura Arias', task: 'Supervisor Derecho. Control de accesos principales y comunicación.'},
+                {id: 16, t: 21.2, l: 51.5, type: 'sup', name: 'Juan Castrillón', task: 'Supervisor Izquierdo. Control de flujo en rampas y escaleras.'},
+                {id: 2, t: 5.8, l: 77.8, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Orientación de asistentes y apoyo en entrada.'},
+                {id: 26, t: 29.5, l: 17.8, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Control rampa Betel.'},
+                {id: 28, t: 11.5, l: 12.2, type: 'vol', name: 'Asignado 28', task: 'Zona 6: Puerta de emergencia superior.'}
             ]
         };
 
-        // Generador de puntos automáticos para completar los 28 (puedes borrarlos cuando llenes los reales)
+        // Rellenar automáticamente los 28 para que salgan todos en el Mapa General
         for(let i=1; i<=28; i++) {
             if(!appData.positions.find(p => p.id === i)) {
-                appData.positions.push({id: i, t: 45, l: 45, type: 'vol', name: 'Personal Asignado', task: 'Logística de evento.'});
+                appData.positions.push({id: i, t: 40 + (Math.random()*10), l: 40 + (Math.random()*10), type: 'vol', name: `Puesto ${i}`, task: 'Asignación de logística para el evento.'});
             }
         }
 
@@ -121,10 +139,6 @@
             document.getElementById('main-map').src = v.img;
             document.getElementById('view-title').innerText = v.title;
             
-            // Cerrar menú en mobile
-            if(window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
-            
-            // UI menú activo
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             if(event) event.currentTarget.classList.add('active');
 
@@ -135,11 +149,8 @@
                 if(v.filter === 'all' || v.filter.includes(p.id)) {
                     const div = document.createElement('div');
                     div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
-                    
-                    // Aquí es donde sucede la magia: top y left son % relativos al mapa actual
                     div.style.top = p.t + '%';
                     div.style.left = p.l + '%';
-                    
                     div.innerText = p.id;
                     div.onclick = () => showInfo(p);
                     layer.appendChild(div);
@@ -148,19 +159,18 @@
         }
 
         function showInfo(p) {
-            document.getElementById('m-pos').innerText = `PUESTO ${p.id}`;
+            document.getElementById('m-id').innerText = `PUESTO #${p.id}`;
             document.getElementById('m-name').innerText = p.name;
-            document.getElementById('m-task').innerText = p.task;
-            document.getElementById('modal').classList.add('open');
+            document.getElementById('m-desc').innerText = p.task;
+            document.getElementById('modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
 
         function closeModal() {
-            document.getElementById('modal').classList.remove('open');
+            document.getElementById('modal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
 
-        // Carga inicial
         window.onload = () => loadView('general');
     </script>
 </body>
