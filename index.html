@@ -6,7 +6,15 @@
     <title>Logística Auditorio - Panel Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #ff5500; --sup: #d00000; --bg: #0a0a0a; --sidebar: #000; --card: #1a1a1a; }
+        :root { 
+            --primary: #ff5500; 
+            --primary-glow: rgba(255, 85, 0, 0.4);
+            --sup: #d00000; 
+            --sup-glow: rgba(208, 0, 0, 0.4);
+            --bg: #0a0a0a; 
+            --sidebar: #000; 
+            --card: #1a1a1a; 
+        }
         
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
@@ -25,38 +33,79 @@
         /* Contenido Principal */
         .main { flex: 1; display: flex; flex-direction: column; position: relative; min-width: 0; }
         
-        /* Barra Superior con Leyenda */
+        /* Barra Superior */
         .top-bar { padding: 0 30px; height: 70px; background: var(--card); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .legend { display: flex; gap: 20px; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #bbb; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
+        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); }
 
-        /* Visor de Mapa - Centrado y sin deformar */
-        .map-viewport { flex: 1; overflow: auto; padding: 20px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); }
-        .map-container { position: relative; display: inline-block; box-shadow: 0 0 50px rgba(0,0,0,0.8); border: 1px solid #333; }
-        .map-img { display: block; max-width: 90vw; max-height: 80vh; height: auto; width: auto; }
+        /* Visor de Mapa */
+        .map-viewport { flex: 1; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%); }
+        .map-container { position: relative; display: inline-block; box-shadow: 0 0 50px rgba(0,0,0,0.8); border: 1px solid #333; transition: transform 0.3s ease; }
+        .map-img { display: block; max-width: 85vw; max-height: 75vh; height: auto; width: auto; }
 
-        /* Pines Mejorados */
+        /* PINES MÁS GRANDES Y MEJORADOS */
         .pin {
-            position: absolute; width: 22px; height: 22px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;
-            color: white; border: 2px solid #fff; transform: translate(-50%, -50%);
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10;
+            position: absolute; 
+            width: 32px; /* Aumentado de 22px */
+            height: 32px; /* Aumentado de 22px */
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 12px; font-weight: 800;
+            color: white; border: 2px solid #fff; 
+            transform: translate(-50%, -50%);
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .pin:hover { transform: translate(-50%, -50%) scale(1.4); z-index: 20; box-shadow: 0 0 15px white; }
-        .pin-sup { background: var(--sup); border-radius: 4px; }
-        .pin-vol { background: var(--primary); }
 
-        /* PopUp Clásico Centrado */
-        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 1000; }
+        /* Efecto de Pulso para visibilidad */
+        .pin::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .pin:hover { 
+            transform: translate(-50%, -50%) scale(1.3); 
+            z-index: 100; 
+            box-shadow: 0 0 20px #fff;
+        }
+
+        .pin-sup { background: var(--sup); border-radius: 6px; }
+        .pin-sup::after { background: var(--sup-glow); }
+        
+        .pin-vol { background: var(--primary); }
+        .pin-vol::after { background: var(--primary-glow); }
+
+        /* PopUp */
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 1000; }
         #modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff; color: #111; width: 350px; border-radius: 12px; z-index: 1001; 
-            overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: #fff; color: #111; width: 90%; max-width: 400px; border-radius: 16px; z-index: 1001; 
+            overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            animation: modalIn 0.3s ease-out;
         }
-        .modal-header { padding: 15px 20px; background: #f4f4f4; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 25px; }
-        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .modal-header { padding: 20px; background: #f8f8f8; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 30px; }
+        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 18px; cursor: pointer; font-weight: bold; font-size: 1rem; letter-spacing: 1px; transition: background 0.2s; }
+        .close-btn:hover { background: var(--primary); }
+
     </style>
 </head>
 <body>
@@ -96,12 +145,13 @@
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
         <div class="modal-header">
-            <span id="m-id" style="font-weight: bold; color: var(--primary); font-size: 0.8rem;"></span>
-            <i class="fas fa-info-circle" style="color:#ccc"></i>
+            <span id="m-id" style="font-weight: bold; color: var(--primary); font-size: 0.8rem; text-transform: uppercase;"></span>
+            <i class="fas fa-user-circle" style="color:#ddd; font-size: 1.5rem;"></i>
         </div>
         <div class="modal-body">
-            <h2 id="m-name" style="margin: 0 0 10px 0; font-size: 1.3rem; letter-spacing: -0.5px;"></h2>
-            <p id="m-task" style="color: #666; font-size: 0.9rem; line-height: 1.5; margin: 0;"></p>
+            <h2 id="m-name" style="margin: 0 0 12px 0; font-size: 1.5rem; letter-spacing: -0.5px; color: #000;"></h2>
+            <div style="width: 30px; height: 3px; background: var(--primary); margin-bottom: 15px;"></div>
+            <p id="m-task" style="color: #444; font-size: 1rem; line-height: 1.6; margin: 0;"></p>
         </div>
         <button class="close-btn" onclick="closeModal()">ENTENDIDO</button>
     </div>
@@ -118,35 +168,30 @@
                 z6: { img: 'zona6.png', title: 'VISTA: ZONA 6', filter: [21, 22, 23, 24, 25, 26, 27, 28] }
             },
             positions: [
-                // SUPERVISORES
                 {id: 1, t: 22.1, l: 72.3, type: 'sup', name: 'Laura Daniela Arias', task: 'Supervisor Derecho. Responsable de coordinación de radio y check-in zonas 1-4.'},
                 {id: 16, t: 21.0, l: 51.3, type: 'sup', name: 'Juan Carlos Castrillón', task: 'Supervisor Izquierdo. Control de flujo en rampas y caracol lobby.'},
-                
-                // VOLUNTARIOS DERECHA
                 {id: 2, t: 6.0, l: 77.8, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Orientación inicial y papás SPK.'},
                 {id: 3, t: 25.0, l: 73.5, type: 'vol', name: 'Marleny Masmela', task: 'Zona 2: Sillas de alabanza y control de lazo.'},
                 {id: 4, t: 38.0, l: 76.0, type: 'vol', name: 'Edith Pertuz', task: 'Zona 2: Apoyo en pasillo derecho.'},
-                {id: 5, t: 48.0, l: 77.5, type: 'vol', name: 'Voluntario 5', task: 'Zona 2: Acomodación posterior.'},
-                {id: 6, t: 70.0, l: 80.5, type: 'vol', name: 'Voluntario 6', task: 'Zona 2: Salida de emergencia lateral.'},
                 {id: 7, t: 26.0, l: 69.0, type: 'vol', name: 'Maritriny Barrera', task: 'Zona 3: Reservas Comité y Staff.'},
-                {id: 8, t: 34.0, l: 70.0, type: 'vol', name: 'Voluntario 8', task: 'Zona 3: Pasillo central derecho.'},
                 {id: 9, t: 48.0, l: 74.0, type: 'vol', name: 'Marcela Páez', task: 'Zona 3: Semáforo de escaleras y flujo baños.'},
-                {id: 10, t: 36.0, l: 51.5, type: 'vol', name: 'Voluntario 10', task: 'Zona 3: Centro derecha.'},
-                {id: 11, t: 50.0, l: 50.0, type: 'vol', name: 'Voluntario 11', task: 'Zona 3/4: Punto de unión central.'},
-                
-                // VOLUNTARIOS IZQUIERDA Y ARRIBA
                 {id: 17, t: 26.0, l: 47.5, type: 'vol', name: 'Sonia Patricia López', task: 'Zona 5: Prioritarios y rampa zona 6.'},
                 {id: 19, t: 48.0, l: 39.5, type: 'vol', name: 'July Jiménez', task: 'Zona 5: Ingreso rampa y forros negros.'},
-                {id: 24, t: 10.0, l: 40.5, type: 'vol', name: 'Martha Lucía Ceballos', task: 'Zona 6: Ubicación abajo hacia arriba.'},
-                {id: 26, t: 30.0, l: 17.5, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Rampa Betel y entrega de caritas felices.'},
-                {id: 28, t: 12.0, l: 12.5, type: 'vol', name: 'Voluntario 28', task: 'Zona 6: Puerta superior izquierda.'}
+                {id: 26, t: 30.0, l: 17.5, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Rampa Betel y entrega de caritas felices.'}
             ]
         };
 
-        // Completar automáticamente los 28 puntos para el Mapa General
+        // Rellenar puestos genéricos faltantes
         for(let i=1; i<=28; i++) {
             if(!appData.positions.find(p => p.id === i)) {
-                appData.positions.push({id: i, t: 60, l: 20 + (i*2), type: 'vol', name: `Puesto ${i}`, task: 'Asignación logística según protocolo de zona.'});
+                appData.positions.push({
+                    id: i, 
+                    t: 15 + (Math.random() * 70), 
+                    l: 15 + (Math.random() * 70), 
+                    type: 'vol', 
+                    name: `Puesto de Apoyo ${i}`, 
+                    task: 'Asignación logística general. Control de accesos y apoyo a supervisores de zona.'
+                });
             }
         }
 
@@ -156,8 +201,7 @@
             const layer = document.getElementById('pins-layer');
             const title = document.getElementById('view-title');
             
-            // Animación de carga
-            img.style.opacity = '0.5';
+            img.style.opacity = '0.3';
             img.src = v.img;
             title.innerText = v.title;
             
@@ -170,21 +214,23 @@
                         div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
                         div.style.top = p.t + '%';
                         div.style.left = p.l + '%';
-                        div.innerText = p.id;
-                        div.onclick = () => showInfo(p);
+                        div.innerHTML = `<span>${p.id}</span>`;
+                        div.onclick = (e) => {
+                            e.stopPropagation();
+                            showInfo(p);
+                        };
                         layer.appendChild(div);
                     }
                 });
             };
 
-            // Estilo menú
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-            const activeItem = Array.from(document.querySelectorAll('.menu-item')).find(m => m.innerText.includes(v.title.split(':').pop().trim()));
+            const activeItem = Array.from(document.querySelectorAll('.menu-item')).find(m => m.innerText.toLowerCase().includes(key.toLowerCase()) || (key === 'general' && m.innerText.includes('General')));
             if(activeItem) activeItem.classList.add('active');
         }
 
         function showInfo(p) {
-            document.getElementById('m-id').innerText = `IDENTIFICADOR DE POSICIÓN #${p.id}`;
+            document.getElementById('m-id').innerText = `ID Posición: #${p.id}`;
             document.getElementById('m-name').innerText = p.name;
             document.getElementById('m-task').innerText = p.task;
             document.getElementById('modal').style.display = 'block';
