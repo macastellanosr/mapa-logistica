@@ -3,39 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logística Auditorio - Mapa Interactivo</title>
+    <title>Logística Auditorio - Mapa de Posiciones</title>
     <style>
-        /* Regresamos al estilo oscuro y elegante */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
         
-        /* Título estilizado que te gustó */
-        h1 { margin: 25px 0; font-weight: 300; letter-spacing: 1px; color: #eee; }
+        h1 { margin: 25px 0; font-weight: 300; letter-spacing: 1px; color: #eee; text-align: center; }
         
         .map-container { position: relative; width: 95%; max-width: 1100px; border: 2px solid #444; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .map-image { width: 100%; display: block; }
 
-        /* Pines con ID: Mezcla de funcionalidad y estética */
+        /* Pines con ID visible - Estilo Premium */
         .pin {
             position: absolute;
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             background: #ff5500;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
             border: 2px solid #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
             transition: all 0.3s ease;
             z-index: 10;
         }
         .pin:hover { transform: scale(1.3); background: #e64d00; box-shadow: 0 0 15px #ff5500; }
 
-        /* Pop-up (Modal) Premium */
+        /* Modal / Pop-up con estilo elegante */
         #modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: #fff; color: #333; padding: 0; border-radius: 15px; 
@@ -55,32 +53,44 @@
         
         .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; 
                      cursor: pointer; font-weight: bold; font-size: 1em; transition: background 0.2s; }
-        .close-btn:hover { background: #000; }
     </style>
 </head>
 <body>
 
-    <h1>🗺️ Mapa de Logística Interactivo</h1>
+    <h1>🗺️ Mapa Auditorio Principal</h1>
 
     <div class="map-container">
         <img src="mapas.png" class="map-image">
 
-        <div class="pin" style="top: 15.5%; left: 77.5%;" onclick="showInfo(1)">1</div>
-        <div class="pin" style="top: 25.5%; left: 69.5%;" onclick="showInfo(2)">2</div>
-        <div class="pin" style="top: 27.5%; left: 71.5%;" onclick="showInfo(3)">3</div>
-        <div class="pin" style="top: 31%; left: 71.5%;" onclick="showInfo(4)">4</div>
-        <div class="pin" style="top: 35.5%; left: 72%;" onclick="showInfo(5)">5</div>
-        <div class="pin" style="top: 40%; left: 72%;" onclick="showInfo(6)">6</div>
-        <div class="pin" style="top: 45%; left: 71.3%;" onclick="showInfo(7)">7</div>
-        <div class="pin" style="top: 50.5%; left: 71.3%;" onclick="showInfo(9)">9</div>
-        <div class="pin" style="top: 14.5%; left: 45.2%;" onclick="showInfo(13)">13</div>
-        <div class="pin" style="top: 28%; left: 46.5%;" onclick="showInfo(17)">17</div>
-        <div class="pin" style="top: 33.5%; left: 46.5%;" onclick="showInfo(18)">18</div>
-        <div class="pin" style="top: 43.5%; left: 47%;" onclick="showInfo(19)">19</div>
-        <div class="pin" style="top: 55%; left: 47.5%;" onclick="showInfo(21)">21</div>
-        <div class="pin" style="top: 32%; left: 24.5%;" onclick="showInfo(24)">24</div>
-        <div class="pin" style="top: 42%; left: 28.5%;" onclick="showInfo(25)">25</div>
-        <div class="pin" style="top: 14.5%; left: 20.2%;" onclick="showInfo(26)">26</div>
+        <div class="pin" style="top: 15%; left: 72%;" onclick="showInfo(1)">1</div>
+        <div class="pin" style="top: 5%; left: 81%;" onclick="showInfo(2)">2</div>
+        <div class="pin" style="top: 25%; left: 75%;" onclick="showInfo(3)">3</div>
+        <div class="pin" style="top: 18%; left: 79%;" onclick="showInfo(4)">4</div>
+        <div class="pin" style="top: 45%; left: 80%;" onclick="showInfo(5)">5</div>
+        <div class="pin" style="top: 68%; left: 83%;" onclick="showInfo(6)">6</div>
+        <div class="pin" style="top: 22%; left: 70%;" onclick="showInfo(7)">7</div>
+        <div class="pin" style="top: 36%; left: 71%;" onclick="showInfo(8)">8</div>
+        <div class="pin" style="top: 47%; left: 73.5%;" onclick="showInfo(9)">9</div>
+        <div class="pin" style="top: 32%; left: 51%;" onclick="showInfo(10)">10</div>
+        <div class="pin" style="top: 50%; left: 49%;" onclick="showInfo(11)">11</div>
+        <div class="pin" style="top: 65%; left: 71%;" onclick="showInfo(12)">12</div>
+        <div class="pin" style="top: 80%; left: 71%;" onclick="showInfo(13)">13</div>
+
+        <div class="pin" style="top: 65%; left: 49%;" onclick="showInfo(14)">14</div>
+        <div class="pin" style="top: 83%; left: 47%;" onclick="showInfo(15)">15</div>
+        <div class="pin" style="top: 16%; left: 51%;" onclick="showInfo(16)">16</div>
+        <div class="pin" style="top: 25%; left: 47%;" onclick="showInfo(17)">17</div>
+        <div class="pin" style="top: 42%; left: 45%;" onclick="showInfo(18)">18</div>
+        <div class="pin" style="top: 48%; left: 40%;" onclick="showInfo(19)">19</div>
+        <div class="pin" style="top: 55%; left: 35.5%;" onclick="showInfo(20)">20</div>
+        <div class="pin" style="top: 64%; left: 13.5%;" onclick="showInfo(21)">21</div>
+        <div class="pin" style="top: 76%; left: 14.5%;" onclick="showInfo(22)">22</div>
+        <div class="pin" style="top: 85%; left: 9.5%;" onclick="showInfo(23)">23</div>
+        <div class="pin" style="top: 10%; left: 39%;" onclick="showInfo(24)">24</div>
+        <div class="pin" style="top: 18%; left: 34%;" onclick="showInfo(25)">25</div>
+        <div class="pin" style="top: 32%; left: 16.5%;" onclick="showInfo(26)">26</div>
+        <div class="pin" style="top: 42%; left: 10.5%;" onclick="showInfo(27)">27</div>
+        <div class="pin" style="top: 10%; left: 9.5%;" onclick="showInfo(28)">28</div>
     </div>
 
     <div id="overlay" onclick="closeModal()"></div>
@@ -91,27 +101,30 @@
         </div>
         <div class="modal-body">
             <strong>📋 Función y Responsabilidades:</strong>
-            <p id="modal-desc"></p>
+            <div id="modal-desc" style="margin-top: 10px;"></div>
         </div>
         <button class="close-btn" onclick="closeModal()">ENTENDIDO</button>
     </div>
 
     <script>
-        // Datos unificados con tu lista completa
         const data = {
-            1: { pos: "1 - Supervisor Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Supervisa zonas 1, 2, 3 y 4. Responsable de check-in, uniformes, actitud y conocimiento de lazos. Coordina ingresos/salidas y reservas de sillas." },
-            2: { pos: "2 - ZONA 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba. Reservado para papás SPK en fin de semana. Sostiene cuerda abajo tras salida de zona 3. Coloca forros negros en 1ra fila." },
-            3: { pos: "3 - ZONA 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila de paso. Dirige a zona 1. Reserva sillas para alabanza. Coloca capas de lluvia. En salida sostiene lazo arriba para población prioritaria." },
-            4: { pos: "4 - ZONA 2 Abajo", radio: false, name: "Edith Mayerly Pertuz Aviles", desc: "Apoya acomodación. Coloca carita feliz a nuevos. Saca las últimas 4 filas por rampa lateral en la salida." },
-            5: { pos: "5 - ZONA 2 Arriba", radio: true, name: "Carlos Julio González Martínez", desc: "Responsable de ingreso. Gestiona reserva de Traducción y Papás SPK. Coloca forros negros (baranda, servidor y arriba)." },
-            9: { pos: "9 - Semáforo Escalera Derecha", radio: false, name: "Marcela Eugenia Paez Cervantes", desc: "Controla flujo a baños con puerta de vidrio para evitar doble vía. En la salida hace la 'L' con el lazo para ampliar flujo." },
-            13: { pos: "13 - ZONA 4 Derecha", radio: true, name: "Jose Guillermo Carrillo Ballesteros", desc: "Responsable de zona. Ubicación abajo hacia arriba. Capas de lluvia alternadas. Coordina salida con centro derecho." },
-            17: { pos: "17 - ZONA 5 Abajo", radio: true, name: "Sonia Patricia López Mora", desc: "Dirige asistentes por rampa zona 6. Ubica prioritarios y sillas de ruedas en 1ra fila. Sostiene lazo arriba en la salida." },
-            26: { pos: "26 - ZONA 6 Arriba", radio: true, name: "Arnulfo Enrique Canchila Herrera", desc: "Dirige asistentes hacia arriba. En salida se ubica abajo. Gestiona salida de nuevos por rampa Betel con carita feliz." }
+            1: { pos: "1 - Supervisor Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Supervisa zonas 1, 2, 3 y 4. Responsable de check-in, uniformes y actitud. Coordina ingresos/salidas y reservas de sillas." },
+            2: { pos: "2 - Zona 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba. Reservado para papás SPK. Sostiene cuerda abajo tras salida de zona 3." },
+            3: { pos: "3 - Zona 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila de paso. Dirige a zona 1. Reserva sillas para alabanza. Coloca capas de lluvia." },
+            4: { pos: "4 - Zona 2 Abajo", radio: false, name: "Edith Mayerly Pertuz Aviles", desc: "Apoya acomodación. Coloca carita feliz a nuevos. Saca últimas 4 filas por rampa lateral en salida." },
+            5: { pos: "5 - Zona 2 Arriba", radio: true, name: "Carlos Julio González Martínez", desc: "Responsable de ingreso. Gestiona reserva de Traducción. Coloca forros negros (baranda, servidor y arriba)." },
+            7: { pos: "7 - Zona 3 Derecha", radio: true, name: "Maritriny Barrera de Lopez", desc: "Responsable de zona. Ingreso hacia lado izquierdo. Reservas de Comité y Staff. Salida alterna: una fila derecha, otra izquierda." },
+            9: { pos: "9 - Semáforo Escalera Derecha", radio: false, name: "Marcela Eugenia Paez Cervantes", desc: "Controla flujo a baños con puerta de vidrio. En la salida hace la 'L' con el lazo para ampliar flujo." },
+            10: { pos: "10 - Zona 3 Izquierda", radio: true, name: "Myriam Rojas Sandoval", desc: "Responsable de zona. Primeras filas para líderes. Salida alterna arriba hacia abajo. Dirige a nuevos al Centro." },
+            13: { pos: "13 - Zona 4 Derecha", radio: false, name: "Marisol Cubillos Pedraza", desc: "Apoya logística de la zona. Atento a salida de nuevos (carita feliz). Sostiene lazo arriba en salida." },
+            16: { pos: "16 - Supervisor Izquierdo", radio: true, name: "Juan Carlos Castrillon", desc: "Supervisa zonas 5 y 6. Responsable de posiciones 16 al 30. Controla flujo en rampas y caracol del lobby." },
+            17: { pos: "17 - Zona 5 Abajo", radio: true, name: "Sonia Patricia López Mora", desc: "Dirige asistentes por rampa zona 6. Ubica prioritarios y sillas de ruedas en 1ra fila. Sostiene lazo arriba." },
+            24: { pos: "24 - Zona 6 Abajo", radio: false, name: "Martha Lucía Ceballos", desc: "Ubicación abajo hacia arriba. Sostiene cuerda abajo. Coordina salida por escalera interna." },
+            26: { pos: "26 - Zona 6 Arriba", radio: true, name: "Arnulfo Enrique Canchila", desc: "Zona extensa: dirige hacia arriba. Salida por rampa Betel con carita feliz." }
         };
 
         function showInfo(id) {
-            const info = data[id] || { pos: `Puesto ${id}`, name: "En Revisión", desc: "Detalles logísticos pendientes de asignar." };
+            const info = data[id] || { pos: `Puesto ${id}`, name: "En Revisión", desc: "Información pendiente de asignación en la base de datos." };
             document.getElementById('modal-pos').innerHTML = info.pos + (info.radio ? ' <span class="radio-badge">📻 RADIO</span>' : '');
             document.getElementById('modal-name').innerText = "Responsable: " + info.name;
             document.getElementById('modal-desc').innerText = info.desc;
