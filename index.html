@@ -3,121 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logística Auditorio - Vistas por Zona</title>
+    <title>Sistema de Logística - Auditorio</title>
     <style>
-        :root { --primary: #ff5500; --bg: #1a1a1a; --sidebar-w: 220px; }
+        :root { --primary: #ff5500; --sup: #d00000; --bg: #1a1a1a; --sidebar-w: 240px; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
         
         /* Menú Lateral */
-        .sidebar { width: var(--sidebar-w); background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; padding: 20px 0; }
-        .sidebar h2 { font-size: 1.1em; padding: 0 20px; margin-bottom: 20px; color: var(--primary); font-weight: 300; }
-        .menu-item { padding: 12px 20px; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent; font-size: 0.9em; color: #ccc; }
-        .menu-item:hover { background: #222; color: white; }
-        .menu-item.active { background: #222; border-left-color: var(--primary); color: white; font-weight: bold; }
+        .sidebar { width: var(--sidebar-w); background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid #222; }
+        .sidebar-header h2 { margin: 0; font-size: 1.2em; color: var(--primary); font-weight: 300; letter-spacing: 1px; }
+        
+        .menu-group { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .menu-item { padding: 12px 20px; cursor: pointer; transition: 0.2s; color: #aaa; display: flex; align-items: center; gap: 10px; }
+        .menu-item:hover { background: #1a1a1a; color: white; }
+        .menu-item.active { background: #222; color: white; border-left: 4px solid var(--primary); font-weight: bold; }
 
-        /* Contenedor Principal */
-        .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; }
-        .map-container { position: relative; width: 100%; max-width: 1000px; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .map-image { width: 100%; display: block; }
+        /* Área de Contenido */
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; background: #1a1a1a; }
+        .top-bar { padding: 15px 30px; background: #151515; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        
+        .map-viewport { flex: 1; position: relative; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
+        .map-container { position: relative; background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); line-height: 0; }
+        .map-image { max-width: 100%; height: auto; display: block; border-radius: 8px; }
 
-        /* Pines numerados */
+        /* Pines */
         .pin {
-            position: absolute; width: 24px; height: 24px; color: white; border-radius: 50%;
+            position: absolute; width: 22px; height: 22px; color: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
-            cursor: pointer; border: 2px solid #fff; box-shadow: 0 3px 6px rgba(0,0,0,0.4); z-index: 10;
+            cursor: pointer; border: 2px solid #fff; transform: translate(-50%, -50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; transition: transform 0.2s;
         }
-        .pin-sup { background: #d00000; }
+        .pin:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 20; }
+        .pin-sup { background: var(--sup); }
         .pin-vol { background: var(--primary); }
 
-        /* Modals y Overlay (Manteniendo tu estilo elegante) */
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; border-radius: 15px; z-index: 1000; width: 90%; max-width: 400px; border-top: 10px solid var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-        .modal-header { background: #f8f8f8; padding: 15px; border-bottom: 1px solid #eee; }
-        .modal-body { padding: 20px; font-size: 0.95em; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; backdrop-filter: blur(4px); }
-        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 12px; cursor: pointer; border-radius: 0 0 15px 15px; }
+        /* Modales */
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; border-radius: 15px; z-index: 1000; width: 90%; max-width: 420px; border-top: 10px solid var(--primary); box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
+        .modal-header { padding: 20px; background: #f9f9f9; border-bottom: 1px solid #eee; border-radius: 15px 15px 0 0; }
+        .modal-body { padding: 25px; line-height: 1.6; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(5px); }
+        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 0 0 15px 15px; }
 
-        /* Leyenda flotante */
-        .legend { margin-top: 15px; display: flex; gap: 15px; font-size: 0.8em; opacity: 0.7; }
+        .legend-mini { display: flex; gap: 15px; font-size: 0.8em; color: #888; }
     </style>
 </head>
 <body>
 
     <nav class="sidebar">
-        <h2>LOGÍSTICA</h2>
-        <div class="menu-item active" onclick="changeView('general', 'mapas.png')">Mapa General</div>
-        <div class="menu-item" onclick="changeView('z1', 'zona1.png')">Zona 1</div>
-        <div class="menu-item" onclick="changeView('z2', 'zona2.png')">Zona 2</div>
-        <div class="menu-item" onclick="changeView('z3', 'zona3.png')">Zona 3</div>
-        <div class="menu-item" onclick="changeView('z4', 'zona4.png')">Zona 4</div>
-        <div class="menu-item" onclick="changeView('z5', 'zona5.png')">Zona 5</div>
-        <div class="menu-item" onclick="changeView('z6', 'zona6.png')">Zona 6</div>
+        <div class="sidebar-header"><h2>AUDITORIO MAP</h2></div>
+        <div class="menu-group">
+            <div class="menu-item active" onclick="changeView('general', 'mapas.png')">🌐 Mapa General</div>
+            <div class="menu-item" onclick="changeView('z1', 'zona1.png')">📍 Zona 1</div>
+            <div class="menu-item" onclick="changeView('z2', 'zona2.png')">📍 Zona 2</div>
+            <div class="menu-item" onclick="changeView('z3', 'zona3.png')">📍 Zona 3</div>
+            <div class="menu-item" onclick="changeView('z4', 'zona4.png')">📍 Zona 4</div>
+            <div class="menu-item" onclick="changeView('z5', 'zona5.png')">📍 Zona 5</div>
+            <div class="menu-item" onclick="changeView('z6', 'zona6.png')">📍 Zona 6</div>
+        </div>
     </nav>
 
     <main class="main-content">
-        <h1 id="view-title" style="font-weight: 300; margin-bottom: 20px;">Mapa General</h1>
+        <div class="top-bar">
+            <h2 id="view-title" style="margin:0; font-weight: 300;">Mapa General</h2>
+            <div class="legend-mini">
+                <span><b style="color:var(--sup)">●</b> Supervisor</span>
+                <span><b style="color:var(--primary)">●</b> Voluntario</span>
+            </div>
+        </div>
         
-        <div class="map-container" id="map-frame">
-            <img src="mapas.png" id="main-img" class="map-image">
-            <div id="pins-layer"></div> </div>
-
-        <div class="legend">
-            <span style="color:#d00000;">● Supervisor</span>
-            <span style="color:#ff5500;">● Voluntario</span>
+        <div class="map-viewport">
+            <div class="map-container">
+                <img src="mapas.png" id="main-img" class="map-image">
+                <div id="pins-layer"></div>
+            </div>
         </div>
     </main>
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
-        <div class="modal-header"><h3 id="m-pos" style="margin:0"></h3></div>
-        <div class="modal-body" id="m-desc"></div>
-        <button class="close-btn" onclick="closeModal()">CERRAR</button>
+        <div class="modal-header"><h3 id="m-pos" style="margin:0; color:var(--primary)"></h3></div>
+        <div class="modal-body">
+            <p id="m-name" style="font-weight: bold; margin-bottom: 10px; font-size: 1.1em;"></p>
+            <div id="m-desc"></div>
+        </div>
+        <button class="close-btn" onclick="closeModal()">CERRAR FICHA</button>
     </div>
 
     <script>
-        const allPins = {
-            general: [
-                {id: 1, t: 22, l: 72, type: 'sup'}, {id: 2, t: 6, l: 77.5, type: 'vol'},
-                {id: 16, t: 21, l: 51.5, type: 'sup'}, {id: 26, t: 30, l: 17.5, type: 'vol'}
-                // Aquí irían todos los IDs para la vista general
-            ],
-            z1: [ {id: 1, t: 40, l: 30, type: 'sup'}, {id: 2, t: 20, l: 60, type: 'vol'} ], // Coordenadas ajustadas al zoom de zona1.png
-            z6: [ {id: 26, t: 50, l: 40, type: 'vol'}, {id: 27, t: 60, l: 30, type: 'vol'} ]
-        };
+        // Configuración de los pines con las coordenadas exactas del mapa general
+        const allPins = [
+            {id: 1, t: 22, l: 72, type: 'sup', zones: ['general', 'z3']},
+            {id: 2, t: 6, l: 77.5, type: 'vol', zones: ['general', 'z1']},
+            {id: 3, t: 25, l: 73.5, type: 'vol', zones: ['general', 'z2']},
+            {id: 4, t: 38, l: 76, type: 'vol', zones: ['general', 'z2']},
+            {id: 5, t: 48, l: 77.5, type: 'vol', zones: ['general', 'z2']},
+            {id: 6, t: 70, l: 80.5, type: 'vol', zones: ['general', 'z2']},
+            {id: 7, t: 26, l: 69, type: 'vol', zones: ['general', 'z3']},
+            {id: 8, t: 34, l: 70, type: 'vol', zones: ['general', 'z3']},
+            {id: 9, t: 48, l: 74, type: 'vol', zones: ['general', 'z3']},
+            {id: 10, t: 36, l: 51.5, type: 'vol', zones: ['general', 'z3']},
+            {id: 11, t: 50, l: 50, type: 'vol', zones: ['general', 'z3', 'z4']},
+            {id: 12, t: 59, l: 71.5, type: 'vol', zones: ['general', 'z4']},
+            {id: 13, t: 72, l: 70.5, type: 'vol', zones: ['general', 'z4']},
+            {id: 14, t: 56, l: 49, type: 'vol', zones: ['general', 'z4']},
+            {id: 15, t: 72, l: 47, type: 'vol', zones: ['general', 'z4']},
+            {id: 16, t: 21, l: 51.5, type: 'sup', zones: ['general', 'z3', 'z5']},
+            {id: 17, t: 26, l: 47.5, type: 'vol', zones: ['general', 'z5']},
+            {id: 18, t: 44, l: 45.5, type: 'vol', zones: ['general', 'z5']},
+            {id: 19, t: 48, l: 39.5, type: 'vol', zones: ['general', 'z5']},
+            {id: 20, t: 55, l: 36, type: 'vol', zones: ['general', 'z5']},
+            {id: 21, t: 56, l: 14.5, type: 'vol', zones: ['general', 'z6']},
+            {id: 22, t: 65, l: 17, type: 'vol', zones: ['general', 'z6']},
+            {id: 23, t: 75, l: 13.5, type: 'vol', zones: ['general', 'z6']},
+            {id: 24, t: 10, l: 40.5, type: 'vol', zones: ['general', 'z6']},
+            {id: 25, t: 16, l: 34.5, type: 'vol', zones: ['general', 'z6']},
+            {id: 26, t: 30, l: 17.5, type: 'vol', zones: ['general', 'z6']},
+            {id: 27, t: 35, l: 12, type: 'vol', zones: ['general', 'z6']},
+            {id: 28, t: 12, l: 12.5, type: 'vol', zones: ['general', 'z6']}
+        ];
 
         const dataInfo = {
-            1: { pos: "Supervisor Derecho", name: "Laura Arias", desc: "Supervisa zonas 1 a 4." },
-            26: { pos: "Zona 6 Arriba", name: "Arnulfo Canchila", desc: "Salida por rampa Betel." }
+            1: { pos: "Puesto 1 - Supervisor Derecho", name: "Laura Arias", desc: "Supervisión de zonas 1-4. Gestión de radio y emergencias." },
+            2: { pos: "Puesto 2 - Zona 1", name: "Rafael Moncaleano", desc: "Ubicación preferencial para papás SPK." },
+            16: { pos: "Puesto 16 - Supervisor Izquierdo", name: "Juan Castrillón", desc: "Supervisión de zonas 5-6. Control de rampas." },
+            26: { pos: "Puesto 26 - Zona 6 Arriba", name: "Arnulfo Canchila", desc: "Dirección de flujo rampa Betel." }
         };
 
         function changeView(zone, imgFile) {
-            // Actualizar UI del menú
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             event.currentTarget.classList.add('active');
             
-            // Cambiar imagen y título
             document.getElementById('main-img').src = imgFile;
             document.getElementById('view-title').innerText = event.currentTarget.innerText;
 
-            // Limpiar y cargar pines de esa zona específica
             const layer = document.getElementById('pins-layer');
             layer.innerHTML = '';
             
-            const pins = allPins[zone] || [];
-            pins.forEach(p => {
-                const div = document.createElement('div');
-                div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
-                div.style.top = p.t + '%';
-                div.style.left = p.l + '%';
-                div.innerText = p.id;
-                div.onclick = () => showInfo(p.id);
-                layer.appendChild(div);
+            // Filtramos: si es 'general', muestra todos. Si es zona, solo los que pertenecen a ella.
+            allPins.forEach(p => {
+                if (zone === 'general' || p.zones.includes(zone)) {
+                    const div = document.createElement('div');
+                    div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
+                    
+                    // IMPORTANTE: En el mapa general usamos coordenadas fijas. 
+                    // Si tus imágenes de zona tienen diferente escala, ajustaremos p.t y p.l para cada zona.
+                    div.style.top = p.t + '%';
+                    div.style.left = p.l + '%';
+                    
+                    div.innerText = p.id;
+                    div.onclick = () => showInfo(p.id);
+                    layer.appendChild(div);
+                }
             });
         }
 
         function showInfo(id) {
-            const info = dataInfo[id] || { pos: "Puesto "+id, name: "Asignado", desc: "Función logística." };
+            const info = dataInfo[id] || { pos: "Puesto "+id, name: "Asignado", desc: "Responsable de la seguridad y ubicación en esta zona." };
             document.getElementById('m-pos').innerText = info.pos;
-            document.getElementById('m-desc').innerHTML = `<strong>Responsable:</strong> ${info.name}<br><br>${info.desc}`;
+            document.getElementById('m-name').innerText = "Responsable: " + info.name;
+            document.getElementById('m-desc').innerText = info.desc;
             document.getElementById('modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -126,9 +170,6 @@
             document.getElementById('modal').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
         }
-
-        // Cargar vista inicial
-        window.onload = () => changeView('general', 'mapas.png');
     </script>
 </body>
 </html>
