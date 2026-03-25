@@ -3,45 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logística Auditorio - Interactivo</title>
+    <title>Logística Auditorio - Base de Datos Real</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
-        h1 { margin: 20px 0; font-weight: 300; }
-        .map-container { position: relative; width: 95%; max-width: 1200px; border: 2px solid #444; border-radius: 10px; overflow: hidden; background: white; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
+        .map-container { position: relative; width: 95%; max-width: 1200px; margin: 20px; border: 2px solid #444; border-radius: 10px; background: white; }
         .map-image { width: 100%; display: block; }
         
-        /* Estilo de los puntos interactivos (puedes ajustar el tamaño aquí) */
         .dot {
-            position: absolute;
-            width: 2.2%; 
-            height: 4%;
-            background: rgba(255, 85, 0, 0.3);
-            border: 1px solid #ff5500;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
+            position: absolute; width: 2.5%; height: 4.5%;
+            background: rgba(255, 85, 0, 0.4); border: 2px solid #ff5500;
+            border-radius: 50%; cursor: pointer; transition: all 0.3s; z-index: 10;
         }
-        .dot:hover { background: rgba(255, 85, 0, 0.8); transform: scale(1.5); box-shadow: 0 0 15px #ff5500; }
+        .dot:hover { background: rgba(255, 85, 0, 0.9); transform: scale(1.4); box-shadow: 0 0 15px #ff5500; }
 
-        /* Modal / Pop-up */
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; padding: 30px; border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 1000; width: 320px; text-align: center; border-top: 8px solid #ff5500; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; backdrop-filter: blur(3px); }
-        .close-btn { background: #ff5500; color: white; border: none; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin-top: 20px; font-weight: bold; }
-        .close-btn:hover { background: #e64d00; }
+        /* Modal Estilizado */
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                 background: white; color: #333; padding: 0; border-radius: 15px; 
+                 box-shadow: 0 20px 50px rgba(0,0,0,0.6); z-index: 1000; width: 90%; max-width: 450px; 
+                 max-height: 80vh; overflow-y: auto; border-top: 10px solid #ff5500; }
+        
+        .modal-header { background: #f8f8f8; padding: 15px; border-bottom: 1px solid #eee; position: sticky; top: 0; }
+        .modal-body { padding: 20px; line-height: 1.6; font-size: 0.95em; }
+        .radio-badge { background: #ff5500; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.7em; vertical-align: middle; }
+        
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                   background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(4px); }
+        
+        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; 
+                     cursor: pointer; font-weight: bold; font-size: 1em; }
     </style>
 </head>
 <body>
 
-    <h1>🗺️ Mapa de Logística Interactivo</h1>
+    <h2 style="text-align:center; font-weight: 300;">📍 Mapa Interactivo de Posiciones</h2>
 
     <div class="map-container">
         <img src="mapas.png" class="map-image">
 
-        <div class="dot" style="top: 22%; left: 74.5%;" onclick="showInfo(2)"></div>
-        <div class="dot" style="top: 36.5%; left: 81.3%;" onclick="showInfo(4)"></div>
+        <div class="dot" style="top: 25%; left: 70%;" onclick="showInfo(1)"></div>
+        <div class="dot" style="top: 18%; left: 74.5%;" onclick="showInfo(2)"></div>
         <div class="dot" style="top: 39%; left: 89.2%;" onclick="showInfo(3)"></div>
-        <div class="dot" style="top: 41%; left: 72.3%;" onclick="showInfo(5)"></div>
+        <div class="dot" style="top: 30.5%; left: 81.3%;" onclick="showInfo(4)"></div>
+        <div class="dot" style="top: 36%; left: 72.3%;" onclick="showInfo(5)"></div>
         <div class="dot" style="top: 64%; left: 76.5%;" onclick="showInfo(6)"></div>
         <div class="dot" style="top: 87.5%; left: 81.2%;" onclick="showInfo(7)"></div>
         <div class="dot" style="top: 45.5%; left: 69.5%;" onclick="showInfo(8)"></div>
@@ -50,64 +53,51 @@
         <div class="dot" style="top: 71%; left: 70.3%;" onclick="showInfo(11)"></div>
         <div class="dot" style="top: 88%; left: 72.5%;" onclick="showInfo(12)"></div>
         <div class="dot" style="top: 21%; left: 45.2%;" onclick="showInfo(13)"></div>
-        <div class="dot" style="top: 45.5%; left: 47.3%;" onclick="showInfo(14)"></div>
-        <div class="dot" style="top: 55%; left: 46.5%;" onclick="showInfo(15)"></div>
-        <div class="dot" style="top: 62.5%; left: 45.8%;" onclick="showInfo(16)"></div>
-        <div class="dot" style="top: 70%; left: 45.8%;" onclick="showInfo(17)"></div>
-        <div class="dot" style="top: 87.5%; left: 45.1%;" onclick="showInfo(18)"></div>
-        <div class="dot" style="top: 15%; left: 37.5%;" onclick="showInfo(23)"></div>
-        <div class="dot" style="top: 21.5%; left: 41.5%;" onclick="showInfo(19)"></div>
-        <div class="dot" style="top: 40%; left: 28.8%;" onclick="showInfo(24)"></div>
-        <div class="dot" style="top: 48%; left: 22.5%;" onclick="showInfo(25)"></div>
-        <div class="dot" style="top: 21.5%; left: 17.8%;" onclick="showInfo(26)"></div>
+        <div class="dot" style="top: 44.5%; left: 47.3%;" onclick="showInfo(14)"></div>
+        <div class="dot" style="top: 54%; left: 46.5%;" onclick="showInfo(15)"></div>
+        <div class="dot" style="top: 15%; left: 37.5%;" onclick="showInfo(16)"></div>
+        <div class="dot" style="top: 61%; left: 45.8%;" onclick="showInfo(17)"></div>
+        <div class="dot" style="top: 86.5%; left: 45.1%;" onclick="showInfo(18)"></div>
+        <div class="dot" style="top: 24.5%; left: 41.5%;" onclick="showInfo(19)"></div>
+        <div class="dot" style="top: 31%; left: 24.2%;" onclick="showInfo(24)"></div>
+        <div class="dot" style="top: 47%; left: 22.5%;" onclick="showInfo(25)"></div>
+        <div class="dot" style="top: 18.5%; left: 17.8%;" onclick="showInfo(26)"></div>
         <div class="dot" style="top: 58%; left: 9.3%;" onclick="showInfo(27)"></div>
-        <div class="dot" style="top: 61%; left: 24.2%;" onclick="showInfo(28)"></div>
-        <div class="dot" style="top: 76%; left: 13.8%;" onclick="showInfo(29)"></div>
+        <div class="dot" style="top: 74%; left: 13.8%;" onclick="showInfo(29)"></div>
         <div class="dot" style="top: 88%; left: 33.3%;" onclick="showInfo(30)"></div>
     </div>
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
-        <h2 id="modal-title"></h2>
-        <hr>
-        <p id="modal-desc"></p>
-        <button class="close-btn" onclick="closeModal()">Entendido</button>
+        <div class="modal-header">
+            <h3 id="modal-pos" style="margin:0; color:#ff5500;"></h3>
+            <p id="modal-name" style="margin:5px 0 0 0; font-weight:bold;"></p>
+        </div>
+        <div class="modal-body">
+            <strong>📋 Función:</strong>
+            <p id="modal-desc"></p>
+        </div>
+        <button class="close-btn" onclick="closeModal()">CERRAR FICHA</button>
     </div>
 
     <script>
-      const data = {
-    1: { title: "Puesto 1", desc: "Líder Zona Derecha superior. Responsable de flujo en Zona 1." },
-    2: { title: "Puesto 2", desc: "Control de Escaleras Zona Derecha. Mantener pasillo despejado." },
-    3: { title: "Puesto 3", desc: "Apoyo Zona 3 (Esquina). Verificación de silletería." },
-    4: { title: "Puesto 4", desc: "Pasillo Central Derecho. Guía de asistentes a Zona 2." },
-    5: { title: "Puesto 5", desc: "Frente a Tarima (Derecha). Protocolo y primera fila." },
-    6: { title: "Puesto 6", desc: "Salida Derecha. Control de flujo hacia pasillo exterior." },
-    7: { title: "Puesto 7", desc: "Esquina Inferior Derecha. Vigilancia de perímetro." },
-    8: { title: "Puesto 8", desc: "Zona 7 (Líder). Coordinación de acomodadores centrales." },
-    9: { title: "Puesto 9", desc: "Pasillo interno Zona 7/9. Evitar aglomeraciones." },
-    10: { title: "Puesto 10", desc: "Apoyo Zona 9. Información a asistentes." },
-    11: { title: "Puesto 11", desc: "Pasillo Salida Derecha abajo. Control de puertas." },
-    12: { title: "Puesto 12", desc: "Esquina inferior central. Punto de información." },
-    13: { title: "Puesto 13", desc: "Líder Tarima Izquierda. Control de acceso a backstage." },
-    14: { title: "Puesto 14", desc: "Seguridad Tarima Lateral. Filtro de personal autorizado." },
-    15: { title: "Puesto 15", desc: "Pasillo Técnico. Control de cables y equipos." },
-    16: { title: "Puesto 16", desc: "Acceso Rampa Izquierda. Ayuda a personas con movilidad reducida." },
-    17: { title: "Puesto 17", desc: "Control Escalera Rampa. Flujo de entrada Izquierda." },
-    18: { title: "Puesto 18", desc: "Base Rampa Izquierda. Recepción de asistentes." },
-    19: { title: "Puesto 19", desc: "Líder Zona Izquierda superior. Coordinación Zona 10." },
-    23: { title: "Puesto 23", desc: "Filtro Zona Izquierda alta. Verificación de boletas." },
-    24: { title: "Puesto 24", desc: "Pasillo Zona 6/10. Guía de público." },
-    25: { title: "Puesto 25", desc: "Control Salida Coffee. Evitar comida dentro del auditorio." },
-    26: { title: "Puesto 26", desc: "Salida Eléctrica Arriba. Vigilancia mecánica." },
-    27: { title: "Puesto 27", desc: "Esquina Superior Izquierda. Seguridad perimetral." },
-    28: { title: "Puesto 28", desc: "Entrada Coffee Abajo. Control de acceso." },
-    29: { title: "Puesto 29", desc: "Escaleras de Emergencia. Mantener libre de obstáculos." },
-    30: { title: "Puesto 30", desc: "Salida de Emergencia Principal. Solo apertura en crisis." }
-};
+        const data = {
+            1: { pos: "1 - Supervisor Lado Derecho", radio: true, name: "Laura Daniela Arias Fontecha", desc: "Organiza voluntarios de zonas 1,2,3,4. Supervisa posición, actitud, uniforme e implementos. Realiza check-in y conoce manejo de lazos y reservas. Informa situaciones al Coordinador." },
+            2: { pos: "2 - ZONA 1", radio: true, name: "Rafael Moncaleano / Gloria Parra", desc: "Ubicación de abajo hacia arriba (Papas SPK en fin de semana). Sostiene cuerda abajo de zona. Coordina salida por escalera interna. Colocación de forros negros (1ra fila abajo y mitad de zona)." },
+            3: { pos: "3 - ZONA 2 Abajo", radio: false, name: "Marleny Masmela", desc: "5ta fila es de paso. Dirige a zona 1. Reserva para alabanza. Salida de nuevos con capas de lluvia. En salida sostiene lazo arriba y dirige de arriba hacia abajo (prioritarios primero)." },
+            4: { pos: "4 - ZONA 2 Abajo", radio: false, name: "Edith Mayerly Pertuz Aviles", desc: "Apoya acomodación. Coloca carita feliz a nuevos. En salida sostiene lazo abajo. Saca últimas 4 filas por la última fila de zona 2; resto por escalera interna." },
+            5: { pos: "5 - ZONA 2 Arriba", radio: true, name: "Carlos Julio González Martínez", desc: "Responsable de ingreso (abajo hacia arriba). Reserva Traducción y Papas SPK. Coloca capas lluvia y 3 forros negros (baranda, detrás servidor y arriba). Dirige salida con lazo según indicación del Centro." },
+            6: { pos: "6 - ZONA 2 Arriba", radio: false, name: "Adriana Isabel Alfonso Palacino", desc: "Apoya ingreso y ubicación. En salida sostiene lazo. Dirige salida de nuevos y coloca carita feliz." },
+            13: { pos: "13 - ZONA 4 Lado Derecho", radio: false, name: "Marisol Cubillos Pedraza", desc: "Apoya logística de la zona. Guía a asistentes. Atento a salida de nuevos (carita feliz). En salida sostiene el lazo en la parte de arriba." },
+            16: { pos: "16 - Supervisor Lado Izquierdo", radio: true, name: "Juan Carlos Castrillon / Silvia Amado", desc: "Supervisa zonas 5, 6 y rampa. Responsable de posiciones 16 al 30. Check-in de voluntarios, supervisa lazos, flujo de rampas y caracol del lobby. Gestión de prioritarios y relevos para predica." },
+            26: { pos: "26 - ZONA 6 Arriba", radio: true, name: "Arnulfo Enrique Canchila Herrera", desc: "Dirige asistentes hacia la parte de arriba. En salida se ubica abajo. Forros negros en 1ra fila y mitad. Dirige nuevos por rampa Betel (carita feliz)." },
+            30: { pos: "30 - ZONA 5 Arriba", radio: false, name: "Ana Maria Palma López", desc: "Ubicada arriba para dirigir asistentes. Anima a la salida. Pendiente de salida de nuevos por rampa Betel." }
+        };
 
         function showInfo(id) {
-            const info = data[id] || { title: `ID ${id}`, desc: "Información pendiente por cargar en la base de datos." };
-            document.getElementById('modal-title').innerText = info.title;
+            const info = data[id] || { pos: `ID ${id}`, name: "Por Asignar", desc: "Descripción en proceso de carga..." };
+            document.getElementById('modal-pos').innerHTML = info.pos + (info.radio ? ' <span class="radio-badge">📻 RADIO</span>' : '');
+            document.getElementById('modal-name').innerText = info.name;
             document.getElementById('modal-desc').innerHTML = info.desc;
             document.getElementById('modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
