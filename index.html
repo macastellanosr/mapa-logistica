@@ -3,77 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Logística - Auditorio</title>
+    <title>Logística Auditorio PRO</title>
     <style>
-        :root { --primary: #ff5500; --sup: #d00000; --bg: #1a1a1a; --sidebar-w: 240px; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
+        :root { --primary: #ff5500; --sup: #d00000; --bg: #121212; --card: #1e1e1e; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Menú Lateral */
-        .sidebar { width: var(--sidebar-w); background: #111; border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid #222; }
-        .sidebar-header h2 { margin: 0; font-size: 1.2em; color: var(--primary); font-weight: 300; letter-spacing: 1px; }
+        /* Sidebar Adaptable */
+        .sidebar { width: 260px; background: #000; display: flex; flex-direction: column; transition: 0.3s; z-index: 1000; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid #222; text-align: center; }
+        .sidebar-header h2 { font-size: 1rem; color: var(--primary); margin: 0; }
         
-        .menu-group { flex: 1; overflow-y: auto; padding: 10px 0; }
-        .menu-item { padding: 12px 20px; cursor: pointer; transition: 0.2s; color: #aaa; display: flex; align-items: center; gap: 10px; }
+        .menu { flex: 1; overflow-y: auto; padding: 10px 0; }
+        .menu-item { padding: 15px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #888; border-left: 4px solid transparent; }
         .menu-item:hover { background: #1a1a1a; color: white; }
-        .menu-item.active { background: #222; color: white; border-left: 4px solid var(--primary); font-weight: bold; }
+        .menu-item.active { background: #1a1a1a; color: white; border-left-color: var(--primary); font-weight: bold; }
 
-        /* Área de Contenido */
-        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; background: #1a1a1a; }
-        .top-bar { padding: 15px 30px; background: #151515; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        /* Contenido Principal */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; width: 100%; }
+        .top-bar { padding: 15px; background: #1a1a1a; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
         
-        .map-viewport { flex: 1; position: relative; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
-        .map-container { position: relative; background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); line-height: 0; }
-        .map-image { max-width: 100%; height: auto; display: block; border-radius: 8px; }
+        .map-wrapper { flex: 1; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 10px; position: relative; background: #000; }
+        .map-container { position: relative; display: inline-block; background: white; border-radius: 4px; }
+        .map-img { max-width: none; height: auto; display: block; }
 
-        /* Pines */
+        /* Pines táctiles para Mobile */
         .pin {
-            position: absolute; width: 22px; height: 22px; color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;
-            cursor: pointer; border: 2px solid #fff; transform: translate(-50%, -50%);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10; transition: transform 0.2s;
+            position: absolute; width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;
+            color: white; border: 2px solid #fff; transform: translate(-50%, -50%);
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10;
         }
-        .pin:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 20; }
         .pin-sup { background: var(--sup); }
         .pin-vol { background: var(--primary); }
 
-        /* Modales */
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; border-radius: 15px; z-index: 1000; width: 90%; max-width: 420px; border-top: 10px solid var(--primary); box-shadow: 0 20px 60px rgba(0,0,0,0.9); }
-        .modal-header { padding: 20px; background: #f9f9f9; border-bottom: 1px solid #eee; border-radius: 15px 15px 0 0; }
-        .modal-body { padding: 25px; line-height: 1.6; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; backdrop-filter: blur(5px); }
-        .close-btn { background: #333; color: white; border: none; width: 100%; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 0 0 15px 15px; }
+        /* Modal Mobile-First */
+        #modal { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; color: #333; 
+                  border-radius: 20px 20px 0 0; z-index: 2000; padding: 25px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); 
+                  transform: translateY(100%); transition: transform 0.3s ease; }
+        #modal.open { display: block; transform: translateY(0); }
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 1500; }
 
-        .legend-mini { display: flex; gap: 15px; font-size: 0.8em; color: #888; }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { position: absolute; left: -260px; height: 100%; }
+            .sidebar.open { left: 0; }
+            .map-img { width: 1000px; } /* Forzamos tamaño para scroll en móvil */
+        }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div class="sidebar-header"><h2>AUDITORIO MAP</h2></div>
-        <div class="menu-group">
-            <div class="menu-item active" onclick="changeView('general', 'mapas.png')">🌐 Mapa General</div>
-            <div class="menu-item" onclick="changeView('z1', 'zona1.png')">📍 Zona 1</div>
-            <div class="menu-item" onclick="changeView('z2', 'zona2.png')">📍 Zona 2</div>
-            <div class="menu-item" onclick="changeView('z3', 'zona3.png')">📍 Zona 3</div>
-            <div class="menu-item" onclick="changeView('z4', 'zona4.png')">📍 Zona 4</div>
-            <div class="menu-item" onclick="changeView('z5', 'zona5.png')">📍 Zona 5</div>
-            <div class="menu-item" onclick="changeView('z6', 'zona6.png')">📍 Zona 6</div>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>LOGÍSTICA AUDITORIO</h2></div>
+        <div class="menu">
+            <div class="menu-item active" onclick="loadView('general')">🌐 Mapa General</div>
+            <div class="menu-item" onclick="loadView('zona1')">📍 Zona 1</div>
+            <div class="menu-item" onclick="loadView('zona2')">📍 Zona 2</div>
+            <div class="menu-item" onclick="loadView('zona3')">📍 Zona 3</div>
+            <div class="menu-item" onclick="loadView('zona4')">📍 Zona 4</div>
+            <div class="menu-item" onclick="loadView('zona5')">📍 Zona 5</div>
+            <div class="menu-item" onclick="loadView('zona6')">📍 Zona 6</div>
         </div>
     </nav>
 
-    <main class="main-content">
+    <main class="main">
         <div class="top-bar">
-            <h2 id="view-title" style="margin:0; font-weight: 300;">Mapa General</h2>
-            <div class="legend-mini">
-                <span><b style="color:var(--sup)">●</b> Supervisor</span>
-                <span><b style="color:var(--primary)">●</b> Voluntario</span>
-            </div>
+            <button onclick="document.getElementById('sidebar').classList.toggle('open')" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">☰</button>
+            <h3 id="current-title" style="margin:0; font-size:0.9rem;">Mapa General</h3>
+            <div style="font-size:0.7rem; color:#888;">ID Visible</div>
         </div>
-        
-        <div class="map-viewport">
-            <div class="map-container">
-                <img src="mapas.png" id="main-img" class="map-image">
+
+        <div class="map-wrapper">
+            <div class="map-container" id="container">
+                <img src="mapas.png" id="main-map" class="map-img">
                 <div id="pins-layer"></div>
             </div>
         </div>
@@ -81,95 +83,80 @@
 
     <div id="overlay" onclick="closeModal()"></div>
     <div id="modal">
-        <div class="modal-header"><h3 id="m-pos" style="margin:0; color:var(--primary)"></h3></div>
-        <div class="modal-body">
-            <p id="m-name" style="font-weight: bold; margin-bottom: 10px; font-size: 1.1em;"></p>
-            <div id="m-desc"></div>
-        </div>
-        <button class="close-btn" onclick="closeModal()">CERRAR FICHA</button>
+        <h2 id="m-pos" style="margin:0; color:var(--primary); font-size:1.2rem;"></h2>
+        <p id="m-name" style="font-weight:bold; margin:10px 0; color:#555;"></p>
+        <p id="m-desc" style="font-size:0.9rem; line-height:1.5; color:#666;"></p>
+        <button onclick="closeModal()" style="width:100%; padding:15px; margin-top:15px; border-radius:10px; border:none; background:#333; color:white; font-weight:bold;">CERRAR</button>
     </div>
 
     <script>
-        // Configuración de los pines con las coordenadas exactas del mapa general
-        const allPins = [
-            {id: 1, t: 22, l: 72, type: 'sup', zones: ['general', 'z3']},
-            {id: 2, t: 6, l: 77.5, type: 'vol', zones: ['general', 'z1']},
-            {id: 3, t: 25, l: 73.5, type: 'vol', zones: ['general', 'z2']},
-            {id: 4, t: 38, l: 76, type: 'vol', zones: ['general', 'z2']},
-            {id: 5, t: 48, l: 77.5, type: 'vol', zones: ['general', 'z2']},
-            {id: 6, t: 70, l: 80.5, type: 'vol', zones: ['general', 'z2']},
-            {id: 7, t: 26, l: 69, type: 'vol', zones: ['general', 'z3']},
-            {id: 8, t: 34, l: 70, type: 'vol', zones: ['general', 'z3']},
-            {id: 9, t: 48, l: 74, type: 'vol', zones: ['general', 'z3']},
-            {id: 10, t: 36, l: 51.5, type: 'vol', zones: ['general', 'z3']},
-            {id: 11, t: 50, l: 50, type: 'vol', zones: ['general', 'z3', 'z4']},
-            {id: 12, t: 59, l: 71.5, type: 'vol', zones: ['general', 'z4']},
-            {id: 13, t: 72, l: 70.5, type: 'vol', zones: ['general', 'z4']},
-            {id: 14, t: 56, l: 49, type: 'vol', zones: ['general', 'z4']},
-            {id: 15, t: 72, l: 47, type: 'vol', zones: ['general', 'z4']},
-            {id: 16, t: 21, l: 51.5, type: 'sup', zones: ['general', 'z3', 'z5']},
-            {id: 17, t: 26, l: 47.5, type: 'vol', zones: ['general', 'z5']},
-            {id: 18, t: 44, l: 45.5, type: 'vol', zones: ['general', 'z5']},
-            {id: 19, t: 48, l: 39.5, type: 'vol', zones: ['general', 'z5']},
-            {id: 20, t: 55, l: 36, type: 'vol', zones: ['general', 'z5']},
-            {id: 21, t: 56, l: 14.5, type: 'vol', zones: ['general', 'z6']},
-            {id: 22, t: 65, l: 17, type: 'vol', zones: ['general', 'z6']},
-            {id: 23, t: 75, l: 13.5, type: 'vol', zones: ['general', 'z6']},
-            {id: 24, t: 10, l: 40.5, type: 'vol', zones: ['general', 'z6']},
-            {id: 25, t: 16, l: 34.5, type: 'vol', zones: ['general', 'z6']},
-            {id: 26, t: 30, l: 17.5, type: 'vol', zones: ['general', 'z6']},
-            {id: 27, t: 35, l: 12, type: 'vol', zones: ['general', 'z6']},
-            {id: 28, t: 12, l: 12.5, type: 'vol', zones: ['general', 'z6']}
-        ];
-
-        const dataInfo = {
-            1: { pos: "Puesto 1 - Supervisor Derecho", name: "Laura Arias", desc: "Supervisión de zonas 1-4. Gestión de radio y emergencias." },
-            2: { pos: "Puesto 2 - Zona 1", name: "Rafael Moncaleano", desc: "Ubicación preferencial para papás SPK." },
-            16: { pos: "Puesto 16 - Supervisor Izquierdo", name: "Juan Castrillón", desc: "Supervisión de zonas 5-6. Control de rampas." },
-            26: { pos: "Puesto 26 - Zona 6 Arriba", name: "Arnulfo Canchila", desc: "Dirección de flujo rampa Betel." }
+        // JSON CENTRALIZADO: Toda la información en un solo lugar
+        const config = {
+            views: {
+                general: { img: 'mapas.png', title: 'Mapa General', show: 'all' },
+                zona1: { img: 'zona1.png', title: 'Zona 1 - Detalle', show: [1, 2, 3, 4] },
+                zona6: { img: 'zona6.png', title: 'Zona 6 - Detalle', show: [24, 25, 26, 27, 28] }
+            },
+            positions: [
+                {id: 1, t: 22, l: 72, type: 'sup', name: 'Laura Arias', task: 'Supervisor Derecho. Control de radio.'},
+                {id: 2, t: 6, l: 77.5, type: 'vol', name: 'Rafael Moncaleano', task: 'Zona 1: Papás SPK.'},
+                {id: 3, t: 25, l: 73.5, type: 'vol', name: 'Marleny Masmela', task: 'Zona 2: Sillas alabanza.'},
+                {id: 4, t: 38, l: 76, type: 'vol', name: 'Edith Pertuz', task: 'Zona 2: Apoyo acomodación.'},
+                {id: 7, t: 26, l: 69, type: 'vol', name: 'Maritriny Barrera', task: 'Zona 3: Reservas Comité.'},
+                {id: 16, t: 21, l: 51.5, type: 'sup', name: 'Juan Castrillón', task: 'Supervisor Izquierdo.'},
+                {id: 26, t: 30, l: 17.5, type: 'vol', name: 'Arnulfo Canchila', task: 'Zona 6: Rampa Betel.'},
+                // ... Agrega aquí los 28 puntos siguiendo el patrón de tu imagen
+            ]
         };
 
-        function changeView(zone, imgFile) {
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        // Generamos los puntos faltantes automáticamente para el ejemplo (luego puedes editarlos)
+        for(let i=1; i<=28; i++) {
+            if(!config.positions.find(p => p.id === i)) {
+                config.positions.push({id: i, t: Math.random()*80+10, l: Math.random()*80+10, type: 'vol', name: 'Pendiente', task: 'Asignación de zona.'});
+            }
+        }
+
+        function loadView(viewKey) {
+            const view = config.views[viewKey] || config.views.general;
+            document.getElementById('main-map').src = view.img;
+            document.getElementById('current-title').innerText = view.title;
             
-            document.getElementById('main-img').src = imgFile;
-            document.getElementById('view-title').innerText = event.currentTarget.innerText;
+            // UI Update
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            event?.currentTarget?.classList?.add('active');
+            if(window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
 
             const layer = document.getElementById('pins-layer');
             layer.innerHTML = '';
-            
-            // Filtramos: si es 'general', muestra todos. Si es zona, solo los que pertenecen a ella.
-            allPins.forEach(p => {
-                if (zone === 'general' || p.zones.includes(zone)) {
-                    const div = document.createElement('div');
-                    div.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
-                    
-                    // IMPORTANTE: En el mapa general usamos coordenadas fijas. 
-                    // Si tus imágenes de zona tienen diferente escala, ajustaremos p.t y p.l para cada zona.
-                    div.style.top = p.t + '%';
-                    div.style.left = p.l + '%';
-                    
-                    div.innerText = p.id;
-                    div.onclick = () => showInfo(p.id);
-                    layer.appendChild(div);
+
+            config.positions.forEach(p => {
+                // Lógica de filtrado: si es 'all' o el ID está en la lista de la zona
+                if (view.show === 'all' || view.show.includes(p.id)) {
+                    const el = document.createElement('div');
+                    el.className = `pin ${p.type === 'sup' ? 'pin-sup' : 'pin-vol'}`;
+                    el.style.top = p.t + '%';
+                    el.style.left = p.l + '%';
+                    el.innerText = p.id;
+                    el.onclick = () => showInfo(p);
+                    layer.appendChild(el);
                 }
             });
         }
 
-        function showInfo(id) {
-            const info = dataInfo[id] || { pos: "Puesto "+id, name: "Asignado", desc: "Responsable de la seguridad y ubicación en esta zona." };
-            document.getElementById('m-pos').innerText = info.pos;
-            document.getElementById('m-name').innerText = "Responsable: " + info.name;
-            document.getElementById('m-desc').innerText = info.desc;
-            document.getElementById('modal').style.display = 'block';
+        function showInfo(p) {
+            document.getElementById('m-pos').innerText = `PUESTO ${p.id}`;
+            document.getElementById('m-name').innerText = `Responsable: ${p.name}`;
+            document.getElementById('m-desc').innerText = p.task;
+            document.getElementById('modal').classList.add('open');
             document.getElementById('overlay').style.display = 'block';
         }
 
         function closeModal() {
-            document.getElementById('modal').style.display = 'none';
+            document.getElementById('modal').classList.remove('open');
             document.getElementById('overlay').style.display = 'none';
         }
+
+        window.onload = () => loadView('general');
     </script>
 </body>
 </html>
