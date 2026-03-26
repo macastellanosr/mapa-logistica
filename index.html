@@ -6,6 +6,74 @@
     <title>Logística Auditorio - Full View</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+
+        /* --- MODAL CON SCROLL INTELIGENTE --- */
+#modal { 
+    display: none; 
+    position: fixed; 
+    background: #fff; 
+    color: #111; 
+    z-index: 6000; 
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 769px) {
+    #modal { 
+        width: 450px; 
+        max-height: 85vh; /* Evita que se salga de la pantalla en PC */
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%) scale(0.9); 
+        border-radius: 15px; 
+    }
+    #modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    #modal { 
+        width: 100%; 
+        max-height: 80vh; /* Límite de altura en celulares */
+        bottom: 0; 
+        left: 0; 
+        right: 0; 
+        border-radius: 25px 25px 0 0; 
+        transform: translateY(100%); 
+    }
+    #modal.open { transform: translateY(0); }
+}
+
+/* El contenedor del texto ahora tiene el scroll */
+.modal-body { 
+    padding: 25px; 
+    overflow-y: auto; 
+    flex: 1; /* Toma todo el espacio disponible */
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
+/* Personalización del scrollbar para que se vea moderno */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+.close-btn { 
+    background: #000; 
+    color: white; 
+    border: none; 
+    width: 100%; 
+    padding: 20px; 
+    font-weight: bold; 
+    cursor: pointer;
+    flex-shrink: 0; /* El botón siempre se queda visible al final */
+}
         :root { 
             --primary: #ff5500; 
             --sup: #d00000; 
