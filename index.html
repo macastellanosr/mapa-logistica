@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Logística Auditorio - Pro Fix</title>
+    <title>Logística Auditorio - Full View</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #ff5500; 
             --sup: #d00000; 
             --bg: #0a0a0a; 
-            --sidebar-bg: #111; /* Un poco más claro para contraste */
+            --sidebar-bg: #111;
             --card: #1a1a1a; 
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR CORREGIDO --- */
+        /* --- SIDEBAR --- */
         .sidebar { 
             width: 280px; background: var(--sidebar-bg); border-right: 1px solid #333; 
-            display: flex; flex-direction: column; 
-            z-index: 5000; /* AUMENTADO: Por encima del overlay */
+            display: flex; flex-direction: column; z-index: 5000; 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -36,68 +35,62 @@
         .close-sidebar { background: #222; border: none; color: white; width: 35px; height: 35px; border-radius: 50%; display: none; cursor: pointer; }
         @media (max-width: 768px) { .close-sidebar { display: flex; align-items: center; justify-content: center; } }
 
-        .menu { flex: 1; padding: 15px 0; overflow-y: auto; }
-        .menu-item { 
-            padding: 16px 25px; cursor: pointer; color: #bbb; display: flex; 
-            align-items: center; gap: 15px; border-left: 4px solid transparent; 
-            transition: 0.2s; font-size: 0.95rem; 
-        }
-        .menu-item i { width: 20px; text-align: center; }
-        .menu-item.active { background: #222; color: #fff; border-left-color: var(--primary); }
+        .menu-item { padding: 16px 25px; cursor: pointer; color: #bbb; display: flex; align-items: center; gap: 15px; border-left: 4px solid transparent; transition: 0.2s; }
+        .menu-item.active { background: #222; color: #fff; border-left-color: var(--primary); font-weight: bold; }
 
         /* --- MAIN --- */
         .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; z-index: 10; }
-        .top-bar { padding: 0 20px; height: 65px; background: var(--card); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-
-        .menu-toggle {
-            background: #222; color: white; border: 1px solid #444; 
-            width: 45px; height: 45px; border-radius: 10px; font-size: 1.2rem; cursor: pointer;
-            display: none; align-items: center; justify-content: center;
-        }
+        .top-bar { padding: 0 20px; height: 60px; background: var(--card); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .menu-toggle { background: #222; color: white; border: 1px solid #444; width: 45px; height: 45px; border-radius: 10px; cursor: pointer; display: none; align-items: center; justify-content: center; }
         @media (max-width: 768px) { .menu-toggle { display: flex; } }
 
-        /* --- MAPA --- */
-        .map-viewport { flex: 1; overflow: auto; background: #000; position: relative; }
-        .map-container { position: relative; display: inline-block; min-width: 1000px; padding: 50px; }
-        .map-img { display: block; width: 100%; height: auto; }
+        /* --- CONTENEDOR DE MAPA INTELIGENTE --- */
+        .map-viewport { 
+            flex: 1; 
+            background: #000; 
+            position: relative;
+            overflow: auto; /* Por defecto permite scroll para el General */
+        }
+
+        /* Clase especial para cuando NO queremos scroll (Zonas 1-6) */
+        .no-scroll { overflow: hidden !important; display: flex; align-items: center; justify-content: center; }
+
+        .map-container { position: relative; display: inline-block; transition: all 0.3s ease; }
+        
+        /* Ajuste de imagen para General */
+        .view-general .map-container { min-width: 1100px; padding: 40px; }
+        .view-general .map-img { width: 100%; height: auto; }
+
+        /* Ajuste de imagen para Zonas (Sin Scroll) */
+        .view-zone .map-container { width: 100%; height: 100%; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .view-zone .map-img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         .pin {
-            position: absolute; width: 44px; height: 44px; border-radius: 50%;
+            position: absolute; width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; 
-            font-size: 16px; font-weight: 900; color: white; border: 2.5px solid #fff; 
+            font-size: 15px; font-weight: 900; color: white; border: 2px solid #fff; 
             transform: translate(-50%, -50%); cursor: pointer; z-index: 100;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .pin-sup { background: var(--sup); border-radius: 12px; }
+        .pin-sup { background: var(--sup); border-radius: 10px; }
         .pin-vol { background: var(--primary); }
 
-        /* --- OVERLAY CORREGIDO --- */
-        #overlay { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.7); 
-            backdrop-filter: blur(4px); 
-            z-index: 4000; /* DEBAJO del sidebar, ENCIMA del mapa */
-        }
-        
-        /* --- MODALES --- */
+        /* --- OVERLAY Y MODALES --- */
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 4000; }
         #modal { 
-            display: none; position: fixed; background: #fff; color: #111; 
-            z-index: 6000; /* ENCIMA DE TODO */
-            overflow: hidden; transition: all 0.3s ease;
+            display: none; position: fixed; background: #fff; color: #111; z-index: 6000; 
+            transition: all 0.3s ease;
         }
 
         @media (min-width: 769px) {
-            #modal { width: 450px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); border-radius: 16px; opacity: 0; }
+            #modal { width: 400px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); border-radius: 15px; }
             #modal.open { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
-
         @media (max-width: 768px) {
             #modal { width: 100%; bottom: 0; left: 0; right: 0; border-radius: 25px 25px 0 0; transform: translateY(100%); }
             #modal.open { transform: translateY(0); }
         }
-
-        .modal-body { padding: 30px; }
-        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 20px; font-weight: bold; cursor: pointer; }
+        .modal-body { padding: 25px; }
+        .close-btn { background: #000; color: white; border: none; width: 100%; padding: 18px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -106,7 +99,7 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>AUDITORIO</h2>
+            <h2>LOGÍSTICA</h2>
             <button class="close-sidebar" onclick="closeAll()"><i class="fas fa-times"></i></button>
         </div>
         <div class="menu">
@@ -123,12 +116,12 @@
     <main class="main">
         <header class="top-bar">
             <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-            <h1 id="view-title" style="margin:0; font-size:1rem;">MAPA GENERAL</h1>
+            <h1 id="view-title" style="font-size: 1rem;">MAPA GENERAL</h1>
             <div style="width:40px"></div>
         </header>
 
-        <div class="map-viewport">
-            <div class="map-container">
+        <div class="map-viewport view-general" id="map-viewport">
+            <div class="map-container" id="map-container">
                 <img src="mapas.png" id="main-map" class="map-img">
                 <div id="pins-layer"></div>
             </div>
@@ -137,39 +130,60 @@
 
     <div id="modal">
         <div class="modal-body">
-            <div style="width:40px; height:4px; background:#ddd; margin:-10px auto 20px; border-radius:10px;"></div>
+            <div style="width:40px; height:4px; background:#ddd; margin:-10px auto 15px; border-radius:10px;"></div>
             <div id="modal-content"></div>
         </div>
         <button class="close-btn" onclick="closeAll()">CERRAR</button>
     </div>
 
     <script>
-        // Mismos datos y funciones de antes, pero con la corrección de closeAll
         const mapFiles = { general: "mapas.png", "1": "zona1.png", "2": "zona2.png", "3": "zona3.png", "4": "zona4.png", "5": "zona5.png", "6": "zona6.png" };
+        
+        // --- DATA DE 28 PUESTOS ---
         const positions = [
-            {id: 1, type: 'sup', zone: 'ZONAS 1,2,3,4', label: 'SUPERVISOR DERECHO', radio: 'RADIO', g: {t:22, l:72}, z: {t:10, l:50}, task: 'Organiza voluntarios zona derecha. Responsable de check-in y logística.'},
-            {id: 2, type: 'vol', zone: 'ZONA 1', label: 'PUESTO #2', radio: 'RADIO', g: {t:8, l:78}, z: {t:25, l:40}, task: 'Ubicación abajo-arriba. Papas SPK. Lazo abajo.'},
-            {id: 3, type: 'vol', zone: 'ZONA 2', label: 'PUESTO #3', radio: '-', g: {t:25, l:74}, z: {t:35, l:45}, task: 'Fila 5 paso. Reserva alabanza. Capas lluvia.'},
-            // ... resto de posiciones igual ...
+            {id: 1, type: 'sup', zone: 'ZONAS 1,2,3,4', label: 'SUPERVISOR DERECHO', g: {t:22, l:72}, z: {t:10, l:50}, task: 'Organiza voluntarios zona derecha.'},
+            {id: 2, type: 'vol', zone: 'ZONA 1', label: 'PUESTO #2', g: {t:8, l:78}, z: {t:25, l:40}, task: 'Ubicación abajo-arriba. Papas SPK.'},
+            {id: 3, type: 'vol', zone: 'ZONA 2', label: 'PUESTO #3', g: {t:25, l:74}, z: {t:35, l:45}, task: 'Fila 5 paso. Reserva líderes.'},
+            {id: 4, type: 'vol', zone: 'ZONA 2', label: 'PUESTO #4', g: {t:38, l:76}, z: {t:55, l:50}, task: 'Apoya acomodación. Carita feliz nuevos.'},
+            {id: 5, type: 'vol', zone: 'ZONA 2', label: 'PUESTO #5', g: {t:15, l:85}, z: {t:20, l:80}, task: 'Responsable arriba. Reserva Traducción.'},
+            {id: 6, type: 'vol', zone: 'ZONA 2', label: 'PUESTO #6', g: {t:10, l:90}, z: {t:15, l:85}, task: 'Ingreso sillas. Salida nuevos.'},
+            {id: 7, type: 'vol', zone: 'ZONA 3', label: 'PUESTO #7', g: {t:26, l:68}, z: {t:35, l:45}, task: 'Acomodación abajo-arriba.'},
+            {id: 8, type: 'vol', zone: 'ZONA 3', label: 'PUESTO #8', g: {t:34, l:70}, z: {t:45, l:50}, task: 'Bandera nuevos. Orientación centro.'},
+            {id: 9, type: 'vol', zone: 'ZONA 3', label: 'PUESTO #9', g: {t:50, l:74}, z: {t:80, l:70}, task: 'Semáforo Escalera Derecha.'},
+            {id: 10, type: 'vol', zone: 'ZONA 3', label: 'PUESTO #10', g: {t:36, l:52}, z: {t:45, l:35}, task: 'Lado Izquierdo. Reservas Supervisor.'},
+            {id: 11, type: 'vol', zone: 'ZONA 3', label: 'PUESTO #11', g: {t:52, l:50}, z: {t:80, l:35}, task: 'Semáforo Escalera Izquierda.'},
+            {id: 12, type: 'vol', zone: 'ZONA 4', label: 'PUESTO #12', g: {t:58, l:70}, z: {t:65, l:70}, task: 'Ubicación abajo-arriba.'},
+            {id: 13, type: 'vol', zone: 'ZONA 4', label: 'PUESTO #13', g: {t:65, l:72}, z: {t:78, l:75}, task: 'Guía nuevos. Lazo arriba salida.'},
+            {id: 14, type: 'vol', zone: 'ZONA 4', label: 'PUESTO #14', g: {t:58, l:48}, z: {t:65, l:30}, task: 'Lado Izquierdo. Salida alterna.'},
+            {id: 15, type: 'vol', zone: 'ZONA 4', label: 'PUESTO #15', g: {t:65, l:45}, z: {t:78, l:25}, task: 'Salida nuevos. Lazo arriba.'},
+            {id: 16, type: 'sup', zone: 'ZONAS 5,6', label: 'SUPERVISOR IZQUIERDO', g: {t:21, l:51}, z: {t:10, l:50}, task: 'Supervisa rampas e ingresos prioritarios.'},
+            {id: 17, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #17', g: {t:28, l:45}, z: {t:40, l:30}, task: 'Responsable prioritarios y ruedas.'},
+            {id: 18, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #18', g: {t:35, l:43}, z: {t:50, l:35}, task: 'Lazo abajo salida. Nuevos rampa.'},
+            {id: 19, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #19', g: {t:48, l:40}, z: {t:65, l:40}, task: 'Ingreso rampa. 3 forros negros.'},
+            {id: 20, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #20', g: {t:55, l:38}, z: {t:75, l:45}, task: 'Apoya ingreso. Lazo salida.'},
+            {id: 21, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #21', g: {t:15, l:35}, z: {t:25, l:20}, task: 'Arriba. Salida rampa Betel.'},
+            {id: 22, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #22', g: {t:8, l:32}, z: {t:15, l:20}, task: 'Ubicación arriba. Anima salida.'},
+            {id: 23, type: 'vol', zone: 'ZONA 5', label: 'PUESTO #23', g: {t:5, l:28}, z: {t:5, l:15}, task: 'Final zona. Lazo salida iglesia.'},
+            {id: 24, type: 'vol', zone: 'ZONA 6', label: 'PUESTO #24', g: {t:12, l:40}, z: {t:20, l:50}, task: 'Iglesia abajo-arriba. Cuerda abajo.'},
+            {id: 25, type: 'vol', zone: 'ZONA 6', label: 'PUESTO #25', g: {t:18, l:30}, z: {t:30, l:35}, task: 'Lazo arriba. Salida rampa Betel.'},
+            {id: 26, type: 'vol', zone: 'ZONA 6', label: 'PUESTO #26', g: {t:30, l:18}, z: {t:45, l:20}, task: 'Arriba. Lazo abajo salida.'},
+            {id: 27, type: 'vol', zone: 'ZONA 6', label: 'PUESTO #27', g: {t:22, l:12}, z: {t:35, l:15}, task: 'Ubicación arriba. Salida Betel.'},
+            {id: 28, type: 'vol', zone: 'ZONA 6', label: 'PUESTO #28', g: {t:10, l:10}, z: {t:15, l:10}, task: 'Última fila. Lazo salida.'}
         ];
 
         let activeView = 'general';
 
         function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            sb.classList.add('open');
+            document.getElementById('sidebar').classList.add('open');
             document.getElementById('overlay').style.display = 'block';
         }
 
         function closeAll() {
-            // Cerrar menú
             document.getElementById('sidebar').classList.remove('open');
-            // Cerrar modal
             const m = document.getElementById('modal');
             m.classList.remove('open');
-            // Ocultar overlay tras animación
             setTimeout(() => {
-                if(!document.getElementById('sidebar').classList.contains('open') && !m.classList.contains('open')) {
+                if(!m.classList.contains('open')) {
                     document.getElementById('overlay').style.display = 'none';
                     m.style.display = 'none';
                 }
@@ -178,15 +192,24 @@
 
         function changeView(view) {
             activeView = view;
+            const viewport = document.getElementById('map-viewport');
             const map = document.getElementById('main-map');
-            map.style.opacity = '0.3';
+            
+            // Cambiar modo de visualización
+            if(view === 'general') {
+                viewport.className = 'map-viewport view-general';
+            } else {
+                viewport.className = 'map-viewport view-zone no-scroll';
+            }
+
+            map.style.opacity = '0';
             setTimeout(() => {
                 map.src = mapFiles[view];
                 document.getElementById('view-title').innerText = view === 'general' ? 'MAPA GENERAL' : `ZONA ${view}`;
                 map.onload = () => { map.style.opacity = '1'; renderPins(); };
             }, 200);
+
             closeAll();
-            
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
                 if(item.innerText.includes(view === 'general' ? 'GENERAL' : `ZONA ${view}`)) item.classList.add('active');
@@ -219,12 +242,8 @@
 
         function showInfo(p) {
             document.getElementById('modal-content').innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:15px;">
-                    <div>
-                        <h2 style="margin:0; font-size:1.3rem; color:var(--primary)">${p.label}</h2>
-                        <small style="color:#666; font-weight:bold">${p.zone}</small>
-                    </div>
-                </div>
+                <h2 style="margin:0; color:var(--primary); font-size:1.3rem;">${p.label}</h2>
+                <small style="color:#666; font-weight:800; display:block; margin-bottom:15px;">${p.zone}</small>
                 <p style="line-height:1.6; color:#333; margin:0;">${p.task}</p>
             `;
             document.getElementById('overlay').style.display = 'block';
