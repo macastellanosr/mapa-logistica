@@ -139,7 +139,7 @@
             <div class="menu-item" onclick="changeView('4')"><i class="fas fa-map-marker-alt"></i> ZONA 4</div>
             <div class="menu-item" onclick="changeView('5')"><i class="fas fa-map-marker-alt"></i> ZONA 5</div>
             <div class="menu-item" onclick="changeView('6')"><i class="fas fa-map-marker-alt"></i> ZONA 6</div>
-            <div class="menu-item" onclick="window.open('https://docs.google.com/presentation/d/1zOMZvFh3L4ebRN9OmGpXYsv_PGh8AYv2SqOEjxcFs9c/edit?slide=id.gc6f980f91_0_33#slide=id.gc6f980f91_0_33', '_blank'); closeAll();"><i class="fas fa-external-link-alt"></i> Manual</div>
+            <div class="menu-item" onclick="showManualOptions()"><i class="fas fa-book"></i> Manual</div>
         </div>
     </aside>
 
@@ -151,6 +151,8 @@
         </header>
 
         <div class="map-viewport view-general" id="map-viewport">
+            <iframe id="manual-iframe" style="display:none; width:100%; height:100%; border:none; position:absolute; top:0; left:0; z-index:50;" allowfullscreen></iframe>
+            
             <div class="map-container" id="map-container">
                 <img src="mapas.png" id="main-map" class="map-img">
                 <div id="pins-layer"></div>
@@ -303,32 +305,69 @@
             }, 300);
         }
 
+        function showManualOptions() {
+            // Ocultamos solo el sidebar para dar paso al modal
+            document.getElementById('sidebar').classList.remove('open');
+            
+            document.getElementById('modal-content').innerHTML = `
+                <h2 style="margin:0; color:var(--primary); font-size:1.3rem; margin-bottom:20px; text-align:center;">Manual de Logística</h2>
+                <div style="display:flex; flex-direction:column; gap:15px;">
+                    <button onclick="window.open('https://docs.google.com/presentation/d/1zOMZvFh3L4ebRN9OmGpXYsv_PGh8AYv2SqOEjxcFs9c/edit?slide=id.gc6f980f91_0_33#slide=id.gc6f980f91_0_33', '_blank'); closeAll();" style="background:#222; color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;"><i class="fas fa-external-link-alt"></i> Abrir en pestaña</button>
+                    <button onclick="changeView('manual')" style="background:var(--primary); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer;"><i class="fas fa-desktop"></i> Ver aquí</button>
+                </div>
+            `;
+            document.getElementById('overlay').style.display = 'block';
+            const m = document.getElementById('modal');
+            m.style.display = 'block';
+            setTimeout(() => m.classList.add('open'), 10);
+        }
+
         function changeView(view) {
             activeView = view;
             const viewport = document.getElementById('map-viewport');
+            const mapContainer = document.getElementById('map-container');
+            const iframe = document.getElementById('manual-iframe');
             const map = document.getElementById('main-map');
             
-            if(view === 'general') {
-                viewport.className = 'map-viewport view-general';
-            } else {
+            if(view === 'manual') {
                 viewport.className = 'map-viewport view-zone no-scroll';
-            }
+                mapContainer.style.display = 'none';
+                iframe.style.display = 'block';
+                // Cambiamos /edit por /embed para que se ajuste perfectamente dentro del iFrame
+                if(!iframe.src) iframe.src = "https://docs.google.com/presentation/d/1zOMZvFh3L4ebRN9OmGpXYsv_PGh8AYv2SqOEjxcFs9c/embed?slide=id.gc6f980f91_0_33";
+                document.getElementById('view-title').innerText = 'MANUAL';
+            } else {
+                mapContainer.style.display = '';
+                iframe.style.display = 'none';
+                
+                if(view === 'general') {
+                    viewport.className = 'map-viewport view-general';
+                } else {
+                    viewport.className = 'map-viewport view-zone no-scroll';
+                }
 
-            map.style.opacity = '0';
-            setTimeout(() => {
-                map.src = mapFiles[view];
-                document.getElementById('view-title').innerText = view === 'general' ? 'MAPA GENERAL' : `ZONA ${view}`;
-                map.onload = () => { map.style.opacity = '1'; renderPins(); };
-            }, 200);
+                map.style.opacity = '0';
+                setTimeout(() => {
+                    map.src = mapFiles[view];
+                    document.getElementById('view-title').innerText = view === 'general' ? 'MAPA GENERAL' : `ZONA ${view}`;
+                    map.onload = () => { map.style.opacity = '1'; renderPins(); };
+                }, 200);
+            }
 
             closeAll();
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
-                if(item.innerText.includes(view === 'general' ? 'GENERAL' : `ZONA ${view}`)) item.classList.add('active');
+                if(view === 'manual') {
+                    if(item.innerText.includes('Manual')) item.classList.add('active');
+                } else {
+                    if(item.innerText.includes(view === 'general' ? 'GENERAL' : `ZONA ${view}`)) item.classList.add('active');
+                }
             });
         }
 
         function renderPins() {
+            if(activeView === 'manual') return; // Evita calcular pines si estamos en la vista de manual
+
             const layer = document.getElementById('pins-layer');
             layer.innerHTML = '';
             positions.forEach(p => {
