@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Logística Auditorio - Full View</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -74,18 +74,7 @@
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        /* Ajuste de height: 100dvh para evitar que se corte el iframe en móviles */
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            margin: 0; 
-            background: var(--bg); 
-            color: white; 
-            display: flex; 
-            height: 100vh; /* Fallback para navegadores antiguos */
-            height: 100dvh; /* Altura dinámica real en móviles */
-            overflow: hidden; 
-        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
 
         .sidebar { 
             width: 280px; background: var(--sidebar-bg); border-right: 1px solid #333; 
@@ -162,7 +151,7 @@
         </header>
 
         <div class="map-viewport view-general" id="map-viewport">
-            <iframe id="manual-iframe" style="display:none; width:100%; height:100%; border:none; z-index:50;" allowfullscreen></iframe>
+            <iframe id="manual-iframe" style="display:none; width:100%; height:100%; border:none; position:absolute; top:0; left:0; z-index:50;" allowfullscreen></iframe>
             
             <div class="map-container" id="map-container">
                 <img src="mapas.png" id="main-map" class="map-img">
@@ -317,6 +306,7 @@
         }
 
         function showManualOptions() {
+            // Ocultamos solo el sidebar para dar paso al modal
             document.getElementById('sidebar').classList.remove('open');
             
             document.getElementById('modal-content').innerHTML = `
@@ -343,6 +333,7 @@
                 viewport.className = 'map-viewport view-zone no-scroll';
                 mapContainer.style.display = 'none';
                 iframe.style.display = 'block';
+                // Cambiamos /edit por /embed para que se ajuste perfectamente dentro del iFrame
                 if(!iframe.src) iframe.src = "https://docs.google.com/presentation/d/1zOMZvFh3L4ebRN9OmGpXYsv_PGh8AYv2SqOEjxcFs9c/embed?slide=id.gc6f980f91_0_33";
                 document.getElementById('view-title').innerText = 'MANUAL';
             } else {
@@ -375,7 +366,7 @@
         }
 
         function renderPins() {
-            if(activeView === 'manual') return;
+            if(activeView === 'manual') return; // Evita calcular pines si estamos en la vista de manual
 
             const layer = document.getElementById('pins-layer');
             layer.innerHTML = '';
